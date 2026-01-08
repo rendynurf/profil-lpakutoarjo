@@ -1,6 +1,6 @@
 /* FILE: interaktif.js (UPDATED V3.0 - FULL DATA)
     STATUS: FINAL
-    DESKRIPSI: Menangani koneksi ke Spreadsheet, Routing Halaman, dan Render Data (Termasuk Kunjungan, Hukum, Pengaduan)
+    DESKRIPSI: Menangani koneksi ke Spreadsheet, Routing Halaman, dan Render Data (Termasuk Kunjungan, Pengaduan)
 */
 
 // --- INISIALISASI ANIMASI ---
@@ -120,7 +120,7 @@ async function loadData() {
 }
 
 // ==========================================
-// 2. RENDER LAYANAN SPESIFIK (KUNJUNGAN, HUKUM, PENGADUAN)
+// 2. RENDER LAYANAN SPESIFIK (KUNJUNGAN, PENGADUAN)
 // ==========================================
 function renderLayananSpesifik(type, data) {
     const container = document.getElementById('service-content-area');
@@ -156,101 +156,106 @@ function renderLayananSpesifik(type, data) {
         return text.toString().replace(/\r?\n/g, '<br>');
     };
 
-    // --- A. HALAMAN KUNJUNGAN (LAYOUT 4 KOLOM - BOLD & RAPI) ---
-    if (type === 'kunjungan') {
-        if (!data) {
-            container.innerHTML = '<div class="col-12 text-center text-muted py-5"><h5>Data kunjungan belum tersedia.</h5></div>';
-            return;
-        }
-
-        // KARTU 1: JADWAL
-        contentHtml += `
-        <div class="col-md-6 col-xl-3" data-aos="fade-up" data-aos-delay="0">
-            <div class="card h-100 border-0 shadow-sm rounded-3 overflow-hidden bg-white">
-                <div class="card-body p-4 position-relative">
-                    <div class="position-absolute top-0 start-0 bottom-0 bg-primary" style="width: 6px;"></div>
-                    <div class="d-flex align-items-center mb-3 pb-2 border-bottom border-light">
-                        <i class="fas fa-clock fa-lg text-primary me-2"></i>
-                        <h5 class="fw-bold text-dark m-0">JADWAL</h5>
-                    </div>
-                    <div>${formatToList(data.jadwal, 'text-primary')}</div>
-                </div>
-            </div>
-        </div>`;
-
-        // KARTU 2: SYARAT
-        contentHtml += `
-        <div class="col-md-6 col-xl-3" data-aos="fade-up" data-aos-delay="100">
-            <div class="card h-100 border-0 shadow-sm rounded-3 overflow-hidden bg-white">
-                <div class="card-body p-4 position-relative">
-                    <div class="position-absolute top-0 start-0 bottom-0 bg-success" style="width: 6px;"></div>
-                    <div class="d-flex align-items-center mb-3 pb-2 border-bottom border-light">
-                        <i class="fas fa-id-card fa-lg text-success me-2"></i>
-                        <h5 class="fw-bold text-dark m-0">SYARAT</h5>
-                    </div>
-                    <div>${formatToList(data.syarat, 'text-success')}</div>
-                </div>
-            </div>
-        </div>`;
-
-        // KARTU 3: HIMBAUAN
-        contentHtml += `
-        <div class="col-md-6 col-xl-3" data-aos="fade-up" data-aos-delay="200">
-            <div class="card h-100 border-0 shadow-sm rounded-3 overflow-hidden bg-white">
-                <div class="card-body p-4 position-relative">
-                    <div class="position-absolute top-0 start-0 bottom-0 bg-danger" style="width: 6px;"></div>
-                    <div class="d-flex align-items-center mb-3 pb-2 border-bottom border-light">
-                        <i class="fas fa-bullhorn fa-lg text-danger me-2"></i>
-                        <h5 class="fw-bold text-dark m-0">HIMBAUAN</h5>
-                    </div>
-                    <div>${formatToList(data.himbauan, 'text-danger')}</div>
-                </div>
-            </div>
-        </div>`;
-
-        // KARTU 4: CATATAN
-        contentHtml += `
-        <div class="col-md-6 col-xl-3" data-aos="fade-up" data-aos-delay="300">
-            <div class="card h-100 border-0 shadow-sm rounded-3 overflow-hidden bg-white">
-                <div class="card-body p-4 position-relative">
-                    <div class="position-absolute top-0 start-0 bottom-0 bg-warning" style="width: 6px;"></div>
-                    <div class="d-flex align-items-center mb-3 pb-2 border-bottom border-light">
-                        <i class="fas fa-info-circle fa-lg text-warning me-2"></i>
-                        <h5 class="fw-bold text-dark m-0">CATATAN</h5>
-                    </div>
-                    <div>${formatToList(data.catatan, 'text-warning')}</div>
-                </div>
-            </div>
-        </div>`;
-
-        container.innerHTML = contentHtml;
-    } 
-    
-    // --- B. HALAMAN HUKUM ---
-    else if (type === 'hukum') {
-        if (data && (Array.isArray(data) ? data.length > 0 : Object.keys(data).length > 0)) {
-             if(Array.isArray(data)) {
-                data.forEach(item => {
-                    contentHtml += `<div class="col-md-6"><div class="card p-4 shadow-sm h-100 border-0"><h5 class="fw-bold">${item.judul || 'Layanan Hukum'}</h5><p>${formatText(item.deskripsi || item.konten)}</p></div></div>`;
-                });
-                container.innerHTML = contentHtml;
-             } else {
-                 container.innerHTML = `<div class="col-lg-10"><div class="card p-5 shadow border-0 rounded-4"><h3 class="fw-bold mb-3">${data.judul || 'Bantuan Hukum'}</h3><p>${formatText(data.deskripsi || data.konten)}</p></div></div>`;
-             }
-        } else {
-            container.innerHTML = `<div class="col-lg-8"><div class="card p-5 shadow border-0 rounded-4 text-center"><div class="text-secondary mb-3"><i class="fas fa-tools fa-4x"></i></div><h2 class="fw-bold text-dark mb-3">Bantuan Hukum</h2><p class="text-muted fs-5">Layanan konsultasi hukum gratis bagi Anak Binaan sedang dalam tahap pengembangan sistem.</p></div></div>`;
-        }
-    } 
-    
-    // --- C. HALAMAN PENGADUAN ---
-    else if (type === 'pengaduan') {
-        if (data) {
-             let kontak = data.nomorWA || data.kontak || "6281575859295";
-             container.innerHTML = `<div class="col-lg-8"><div class="card p-5 shadow border-0 rounded-4 text-center"><div class="text-success mb-3"><i class="fas fa-headset fa-4x"></i></div><h2 class="fw-bold text-dark mb-4">${data.judul || 'Layanan Pengaduan'}</h2><p class="mb-4">${formatText(data.deskripsi || 'Sampaikan pengaduan Anda melalui kanal resmi kami.')}</p><a href="https://wa.me/${kontak}" class="btn btn-success rounded-pill px-4 fw-bold py-2"><i class="fab fa-whatsapp me-2"></i> Hubungi Kami</a></div></div>`;
-        } else {
-            container.innerHTML = `<div class="col-lg-8"><div class="card p-5 shadow border-0 rounded-4 text-center"><div class="text-success mb-3"><i class="fas fa-headset fa-4x"></i></div><h2 class="fw-bold text-dark mb-4">Layanan Pengaduan</h2><p class="text-muted mb-4">Kami siap menerima masukan dan pengaduan Anda.</p><a href="https://wa.me/6281575859295" class="btn btn-success rounded-pill px-4 fw-bold">WhatsApp Admin</a></div></div>`;
-        }
+// --- A. HALAMAN KUNJUNGAN (LAYOUT 4 KOLOM - BOLD & RAPI) ---
+if (type === 'kunjungan') {
+    if (!data) {
+        container.innerHTML = '<div class="col-12 text-center text-muted py-5"><h5>Data kunjungan belum tersedia.</h5></div>';
+        return;
     }
+
+    // KARTU 1: JADWAL
+    contentHtml += `
+    <div class="col-md-6 col-xl-3" data-aos="fade-up" data-aos-delay="0">
+        <div class="card h-100 border-0 shadow-sm rounded-3 overflow-hidden bg-white">
+            <div class="card-body p-4 position-relative">
+                <div class="position-absolute top-0 start-0 bottom-0 bg-primary" style="width: 6px;"></div>
+                <div class="d-flex align-items-center mb-3 pb-2 border-bottom border-light">
+                    <i class="fas fa-clock fa-lg text-primary me-2"></i>
+                    <h5 class="fw-bold text-dark m-0">JADWAL</h5>
+                </div>
+                <div>${formatToList(data.jadwal, 'text-primary')}</div>
+            </div>
+        </div>
+    </div>`;
+
+    // KARTU 2: SYARAT
+    contentHtml += `
+    <div class="col-md-6 col-xl-3" data-aos="fade-up" data-aos-delay="100">
+        <div class="card h-100 border-0 shadow-sm rounded-3 overflow-hidden bg-white">
+            <div class="card-body p-4 position-relative">
+                <div class="position-absolute top-0 start-0 bottom-0 bg-success" style="width: 6px;"></div>
+                <div class="d-flex align-items-center mb-3 pb-2 border-bottom border-light">
+                    <i class="fas fa-id-card fa-lg text-success me-2"></i>
+                    <h5 class="fw-bold text-dark m-0">SYARAT</h5>
+                </div>
+                <div>${formatToList(data.syarat, 'text-success')}</div>
+            </div>
+        </div>
+    </div>`;
+
+    // KARTU 3: HIMBAUAN
+    contentHtml += `
+    <div class="col-md-6 col-xl-3" data-aos="fade-up" data-aos-delay="200">
+        <div class="card h-100 border-0 shadow-sm rounded-3 overflow-hidden bg-white">
+            <div class="card-body p-4 position-relative">
+                <div class="position-absolute top-0 start-0 bottom-0 bg-danger" style="width: 6px;"></div>
+                <div class="d-flex align-items-center mb-3 pb-2 border-bottom border-light">
+                    <i class="fas fa-bullhorn fa-lg text-danger me-2"></i>
+                    <h5 class="fw-bold text-dark m-0">HIMBAUAN</h5>
+                </div>
+                <div>${formatToList(data.himbauan, 'text-danger')}</div>
+            </div>
+        </div>
+    </div>`;
+
+    // KARTU 4: CATATAN
+    contentHtml += `
+    <div class="col-md-6 col-xl-3" data-aos="fade-up" data-aos-delay="300">
+        <div class="card h-100 border-0 shadow-sm rounded-3 overflow-hidden bg-white">
+            <div class="card-body p-4 position-relative">
+                <div class="position-absolute top-0 start-0 bottom-0 bg-warning" style="width: 6px;"></div>
+                <div class="d-flex align-items-center mb-3 pb-2 border-bottom border-light">
+                    <i class="fas fa-info-circle fa-lg text-warning me-2"></i>
+                    <h5 class="fw-bold text-dark m-0">CATATAN</h5>
+                </div>
+                <div>${formatToList(data.catatan, 'text-warning')}</div>
+            </div>
+        </div>
+    </div>`;
+
+    // KARTU 5: SOP (BARU - DITAMBAHKAN DI ROW BARU)
+    contentHtml += `
+    </div> <!-- Tutup row pertama -->
+    <div class="row justify-content-center mt-4"> <!-- Row baru untuk SOP -->
+        <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="400">
+            <a href="javascript:void(0);" onclick="openDocPreview('Standar Operasional Prosedur Prosedur', '${data.url_sop || ''}')" class="btn btn-warning text-dark text-start py-2 hover-scale border-0 shadow-sm">
+                        <div class="d-flex align-items-center">
+                            <div class="bg-white bg-opacity-25 rounded-circle p-2 me-3" style="width: 45px; height: 45px; display: flex; align-items: center; justify-content: center;">
+                                <i class="fas fa-book-reader fs-5"></i>
+                            </div>
+                            <div class="lh-sm overflow-hidden">
+                                <small class="d-block text-dark-50" style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px;">Standar Operasional Prosedur Prosedur</small>
+                                <span class="fw-bold small text-truncate d-block">${data.sop || 'Dokumen SOP'}</span>
+                            </div>
+                        </div>
+                    </a>
+        </div>
+    </div>`;
+
+    container.innerHTML = contentHtml;
+}
+
+else if (type === 'pengaduan') {
+    // Jika ada data di spreadsheet (tab 'Pengaduan')
+    if (data) {
+         let kontak = data.nomorWA || data.kontak || "6281575859295";
+         let pesan = data.pesanDefault || "Layanan Pengaduan Masyarakat";
+         container.innerHTML = `<div class="col-lg-8"><div class="card p-5 shadow border-0 rounded-4 text-center"><div class="text-success mb-3"><i class="fas fa-headset fa-4x"></i></div><h2 class="fw-bold text-dark mb-4">${data.judul || 'Layanan Pengaduan'}</h2><p class="mb-4">${formatText(data.deskripsi || 'Sampaikan pengaduan Anda melalui kanal resmi kami.')}</p><a href="https://wa.me/${kontak}" class="btn btn-success rounded-pill px-4 fw-bold py-2"><i class="fab fa-whatsapp me-2"></i> Hubungi Kami</a></div></div>`;
+    } else {
+        // Fallback (Tampilan Default)
+        container.innerHTML = `<div class="col-lg-8"><div class="card p-5 shadow border-0 rounded-4 text-center"><div class="text-success mb-3"><i class="fas fa-headset fa-4x"></i></div><h2 class="fw-bold text-dark mb-4">Layanan Pengaduan</h2><p class="text-muted mb-4">Kami siap menerima masukan dan pengaduan Anda.</p><a href="https://wa.me/6281575859295" class="btn btn-success rounded-pill px-4 fw-bold">WhatsApp Admin</a></div></div>`;
+    }
+}
 }
 
 // ==========================================
@@ -1007,9 +1012,8 @@ function getQueryParam(param) {
     return urlParams.get(param); 
 }
     
-
 // ==========================================
-// RENDER HALAMAN PKBM (GALERI + CHART LINE + ANGKA)
+// RENDER HALAMAN PKBM (REVISI: BAR CHART & FILTER KOMPLEKS)
 // ==========================================
 function renderPKBM(list) {
     const container = document.getElementById('pkbm-content-area');
@@ -1020,15 +1024,16 @@ function renderPKBM(list) {
         return;
     }
 
-    // 1. Inisialisasi Modal Galeri (Jika fungsi tersedia)
+    // 1. Inisialisasi Modal Galeri (Jika ada)
     if (typeof initGalleryModal === 'function') {
         initGalleryModal();
     }
 
-    // --- 2. PERSIAPAN DATA ---
+    // --- 2. PERSIAPAN DATA UMUM (HEADER) ---
+    // Mengambil data terbaru (index 0 karena asumsi sort descending)
     const data = list[0]; 
-    
-    // Data Statistik (Baris Pertama/Terbaru)
+
+    // Data Statistik Header
     let gl = parseInt(data.guru_laki) || 0;
     let gp = parseInt(data.guru_perempuan) || 0;
     let totalGuru = gl + gp;
@@ -1036,69 +1041,22 @@ function renderPKBM(list) {
     let gd = parseInt(data.guru_diploma) || 0;
     let gs = parseInt(data.guru_strata) || 0;
     
-    // Total untuk Badge Summary
+    // Total Data Terbaru
     let totalSiswa = (parseInt(data.siswa_a)||0) + (parseInt(data.siswa_b)||0) + (parseInt(data.siswa_c)||0);
-    let totalLulus = (parseInt(data.lulus_a)||0) + (parseInt(data.lulus_b)||0) + (parseInt(data.lulus_c)||0);
-
-    // Hitung Rasio Pendidik vs Siswa
+    
+    // Hitung Rasio
     let ratioText = "Data Belum Lengkap";
     if (totalGuru > 0 && totalSiswa > 0) {
         let ratioVal = Math.round(totalSiswa / totalGuru);
         ratioText = `1 : ${ratioVal}`;
     } else if (totalGuru > 0 && totalSiswa === 0) {
-        ratioText = "-"; // Siswa belum diisi
+        ratioText = "-"; 
     }
-
-    // --- 3. LOGIKA DATASET CHART LINE (MULTI TAHUN) ---
-    let chartDatasets = [];
-    
-    list.forEach((row, index) => {
-        // Label Tahun
-        let yearLabel = row.tahun ? row.tahun.toString() : (list.length > 1 ? `Tahun ${index + 1}` : '');
-        let suffix = yearLabel ? ` (${yearLabel})` : '';
-
-        // Data Row
-        let sa = parseInt(row.siswa_a)||0, sb = parseInt(row.siswa_b)||0, sc = parseInt(row.siswa_c)||0;
-        let la = parseInt(row.lulus_a)||0, lb = parseInt(row.lulus_b)||0, lc = parseInt(row.lulus_c)||0;
-
-        // Dataset Siswa (Garis Solid Biru)
-        chartDatasets.push({
-            label: `Siswa Aktif${suffix}`,
-            data: [sa, sb, sc],
-            borderColor: '#0d6efd',
-            backgroundColor: 'rgba(13, 110, 253, 0.1)',
-            borderWidth: 3,
-            tension: 0.4,
-            pointRadius: 6,
-            pointHoverRadius: 8,
-            pointBackgroundColor: '#fff',
-            pointBorderColor: '#0d6efd',
-            pointBorderWidth: 2,
-            opacity: index === 0 ? 1 : 0.6
-        });
-
-        // Dataset Lulusan (Garis Putus-putus Hijau)
-        chartDatasets.push({
-            label: `Lulusan${suffix}`,
-            data: [la, lb, lc],
-            borderColor: '#198754',
-            backgroundColor: 'rgba(25, 135, 84, 0.1)',
-            borderWidth: 3,
-            tension: 0.4,
-            pointRadius: 6,
-            pointHoverRadius: 8,
-            pointBackgroundColor: '#fff',
-            pointBorderColor: '#198754',
-            pointBorderWidth: 2,
-            borderDash: [5, 5],
-            opacity: index === 0 ? 1 : 0.6
-        });
-    });
 
     let logoUrl = fixGoogleDriveImage(data.logo);
     let html = '';
 
-    // --- 4. LAYOUT: DESKRIPSI & SOP ---
+    // --- 3. HTML STRUKTUR (DESKRIPSI TETAP DIPERTAHANKAN) ---
     html += `
     <div class="row g-4 mb-5">
         <div class="col-lg-8" data-aos="fade-right">
@@ -1138,7 +1096,6 @@ function renderPKBM(list) {
                 </div>
 
                 <div class="d-grid gap-3 position-relative px-2" style="z-index: 2;">
-                    
                     <a href="javascript:void(0);" onclick="openDocPreview('Badan Hukum', '${data.url_badan_hukum || ''}')" class="btn btn-outline-light text-start py-2 hover-scale border-opacity-50">
                         <div class="d-flex align-items-center">
                             <div class="bg-white bg-opacity-25 rounded-circle p-2 me-3" style="width: 45px; height: 45px; display: flex; align-items: center; justify-content: center;">
@@ -1150,7 +1107,6 @@ function renderPKBM(list) {
                             </div>
                         </div>
                     </a>
-
                     <a href="javascript:void(0);" onclick="openDocPreview('Surat Keputusan', '${data.url_sk || ''}')" class="btn btn-outline-light text-start py-2 hover-scale border-opacity-50">
                         <div class="d-flex align-items-center">
                             <div class="bg-white bg-opacity-25 rounded-circle p-2 me-3" style="width: 45px; height: 45px; display: flex; align-items: center; justify-content: center;">
@@ -1162,33 +1118,29 @@ function renderPKBM(list) {
                             </div>
                         </div>
                     </a>
-
-                    <a href="javascript:void(0);" onclick="openDocPreview('Standar Operasional', '${data.url_sop || ''}')" class="btn btn-warning text-dark text-start py-2 hover-scale border-0 shadow-sm">
+                    <a href="javascript:void(0);" onclick="openDocPreview('Standar Operasional Prosedur', '${data.url_sop || ''}')" class="btn btn-warning text-dark text-start py-2 hover-scale border-0 shadow-sm">
                         <div class="d-flex align-items-center">
                             <div class="bg-white bg-opacity-25 rounded-circle p-2 me-3" style="width: 45px; height: 45px; display: flex; align-items: center; justify-content: center;">
                                 <i class="fas fa-book-reader fs-5"></i>
                             </div>
                             <div class="lh-sm overflow-hidden">
-                                <small class="d-block text-dark-50" style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px;">Standar Operasional</small>
+                                <small class="d-block text-dark-50" style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px;">Standar Operasional Prosedur</small>
                                 <span class="fw-bold small text-truncate d-block">${data.sop || 'Dokumen SOP'}</span>
                             </div>
                         </div>
                     </a>
-
                 </div>
             </div>
         </div>
     </div>`;
 
-    // --- 5. LAYOUT: GALERI KEGIATAN (FITUR BARU) ---
-    // Pastikan variabel globalData tersedia, jika tidak gunakan array kosong
+    // --- 4. GALERI ---
     const galeriData = (typeof globalData !== 'undefined' && globalData.galeri_pkbm) ? globalData.galeri_pkbm : [];
-    
     if (typeof renderGallerySlider === 'function') {
         html += renderGallerySlider(galeriData, "Galeri Kegiatan PKBM", "pkbmGallery", "primary");
     }
 
-    // --- 6. LAYOUT: STATISTIK ---
+    // --- 5. TABEL STATISTIK ---
     html += `
     <h4 class="fw-bold text-center text-dark mb-4 mt-5" data-aos="fade-up">Statistik Tenaga Kependidikan</h4>
     
@@ -1201,34 +1153,17 @@ function renderPKBM(list) {
                 <div class="card-body p-0">
                     <div class="table-responsive">
                         <table class="table table-striped table-hover align-middle mb-0">
-                            <thead class="table-light">
-                                <tr>
-                                    <th class="ps-4">Gender</th>
-                                    <th class="text-end pe-4">Jumlah</th>
-                                </tr>
-                            </thead>
+                            <thead class="table-light"><tr><th class="ps-4">Gender</th><th class="text-end pe-4">Jumlah</th></tr></thead>
                             <tbody>
-                                <tr>
-                                    <td class="ps-4">Laki-Laki</td>
-                                    <td class="text-end pe-4 fw-bold">${gl}</td>
-                                </tr>
-                                <tr>
-                                    <td class="ps-4">Perempuan</td>
-                                    <td class="text-end pe-4 fw-bold">${gp}</td>
-                                </tr>
+                                <tr><td class="ps-4">Laki-Laki</td><td class="text-end pe-4 fw-bold">${gl}</td></tr>
+                                <tr><td class="ps-4">Perempuan</td><td class="text-end pe-4 fw-bold">${gp}</td></tr>
                             </tbody>
-                            <tfoot class="table-light">
-                                <tr>
-                                    <td class="ps-4 fw-bold">Total Pendidik</td>
-                                    <td class="text-end pe-4 fw-bold text-primary">${totalGuru}</td>
-                                </tr>
-                            </tfoot>
+                            <tfoot class="table-light"><tr><td class="ps-4 fw-bold">Total Pendidik</td><td class="text-end pe-4 fw-bold text-primary">${totalGuru}</td></tr></tfoot>
                         </table>
                     </div>
                 </div>
             </div>
         </div>
-
         <div class="col-md-6 col-lg-4" data-aos="zoom-in" data-aos-delay="200">
             <div class="card border-0 shadow-sm rounded-4 h-100">
                 <div class="card-header bg-white fw-bold text-center py-3 border-bottom text-success">
@@ -1237,34 +1172,17 @@ function renderPKBM(list) {
                 <div class="card-body p-0">
                     <div class="table-responsive">
                         <table class="table table-striped table-hover align-middle mb-0">
-                            <thead class="table-light">
-                                <tr>
-                                    <th class="ps-4">Pendidikan</th>
-                                    <th class="text-end pe-4">Jumlah</th>
-                                </tr>
-                            </thead>
+                            <thead class="table-light"><tr><th class="ps-4">Pendidikan</th><th class="text-end pe-4">Jumlah</th></tr></thead>
                             <tbody>
-                                <tr>
-                                    <td class="ps-4">Diploma</td>
-                                    <td class="text-end pe-4 fw-bold">${gd}</td>
-                                </tr>
-                                <tr>
-                                    <td class="ps-4">Sarjana</td>
-                                    <td class="text-end pe-4 fw-bold">${gs}</td>
-                                </tr>
+                                <tr><td class="ps-4">Diploma</td><td class="text-end pe-4 fw-bold">${gd}</td></tr>
+                                <tr><td class="ps-4">Sarjana</td><td class="text-end pe-4 fw-bold">${gs}</td></tr>
                             </tbody>
-                            <tfoot class="table-light">
-                                <tr>
-                                    <td class="ps-4 fw-bold">Total</td>
-                                    <td class="text-end pe-4 fw-bold text-success">${totalGuru}</td>
-                                </tr>
-                            </tfoot>
+                            <tfoot class="table-light"><tr><td class="ps-4 fw-bold">Total</td><td class="text-end pe-4 fw-bold text-success">${totalGuru}</td></tr></tfoot>
                         </table>
                     </div>
                 </div>
             </div>
         </div>
-
         <div class="col-md-6 col-lg-4" data-aos="zoom-in" data-aos-delay="300">
             <div class="card border-0 shadow-sm rounded-4 h-100">
                 <div class="card-header bg-white fw-bold text-center py-3 border-bottom text-warning">
@@ -1274,7 +1192,6 @@ function renderPKBM(list) {
                     <div style="height: 220px; position: relative;">
                         <canvas id="chartRatioPKBM"></canvas>
                     </div>
-                    
                     <div class="text-center mt-3 pt-3 border-top">
                         <h4 class="fw-bold text-dark mb-0">${ratioText}</h4>
                         <small class="text-muted fw-bold">Rasio (Tenaga Pendidik : Siswa Aktif)</small>
@@ -1288,14 +1205,27 @@ function renderPKBM(list) {
         <div class="col-12">
             <div class="card border-0 shadow-sm rounded-4 p-4">
                 <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
-                    <h5 class="fw-bold text-primary m-0"><i class="fas fa-chart-line me-2"></i>Tren Warga Belajar & Lulusan</h5>
-                    <div>
-                        <span class="badge bg-primary me-1 px-3 py-2">Siswa Aktif: ${totalSiswa}</span>
-                        <span class="badge bg-success px-3 py-2">Total Lulusan: ${totalLulus}</span>
+                    <h5 class="fw-bold text-primary m-0"><i class="fas fa-chart-line me-2"></i>Grafik Data Warga Belajar</h5>
+                    
+                    <div class="d-flex align-items-center gap-2 flex-wrap">
+                        <div id="filterKategoriContainer" style="display: block;">
+                            <select id="filterKategoriPKBM" class="form-select form-select-sm border-secondary fw-bold" style="width: auto; min-width: 120px;">
+                                <option value="semua">Tampilkan Semua</option>
+                                <option value="siswa">Hanya Siswa Aktif</option>
+                                <option value="lulusan">Hanya Lulusan</option>
+                            </select>
+                        </div>
+                        
+                        <select id="filterTahunPKBM" class="form-select form-select-sm border-primary text-primary fw-bold" style="width: auto; min-width: 140px;">
+                            <option value="all">Semua Tahun</option>
+                        </select>
                     </div>
                 </div>
-                <div style="height: 350px; width: 100%;">
+                <div style="height: 400px; width: 100%;">
                     <canvas id="chartSiswaLulus"></canvas>
+                </div>
+                <div class="mt-2 text-center text-muted small fst-italic">
+                    <i class="fas fa-info-circle me-1"></i> Data dikelompokkan berdasarkan Paket A, B, dan C.
                 </div>
             </div>
         </div>
@@ -1303,16 +1233,15 @@ function renderPKBM(list) {
 
     container.innerHTML = html;
 
-    // --- 7. INISIALISASI BOOTSTRAP CAROUSEL (UNTUK GALERI) ---
+    // --- 7. INISIALISASI PLUGIN & CHART PIE (Sama seperti sebelumnya) ---
     const carouselEl = document.getElementById('pkbmGallery');
     if(carouselEl && typeof bootstrap !== 'undefined') {
         new bootstrap.Carousel(carouselEl, { interval: 5000, wrap: true, pause: 'hover' });
     }
 
-    // --- 8. INISIALISASI CHART.JS DENGAN PLUGIN ANGKA ---
     if (typeof Chart === 'undefined') return;
 
-    // Plugin Custom untuk Menampilkan Angka
+    // Plugin Data Labels
     const dataLabelsPlugin = {
         id: 'dataLabelsPlugin',
         afterDatasetsDraw(chart) {
@@ -1324,23 +1253,21 @@ function renderPKBM(list) {
                 meta.data.forEach((element, index) => {
                     const value = dataset.data[index];
                     if (value === 0 || value === null || value === undefined) return;
-
-                    const fontSize = 13;
-                    ctx.font = `bold ${fontSize}px "Helvetica Neue", Helvetica, Arial, sans-serif`;
+                    const fontSize = 11;
+                    ctx.font = `bold ${fontSize}px sans-serif`;
                     ctx.textAlign = 'center';
                     let position = element.tooltipPosition();
-
+                    
                     if (meta.type === 'doughnut' || meta.type === 'pie') {
                         ctx.textBaseline = 'middle';
                         ctx.fillStyle = '#fff'; 
-                        ctx.lineWidth = 2;
-                        ctx.strokeStyle = 'rgba(0,0,0,0.2)'; 
                         ctx.strokeText(value, position.x, position.y);
                         ctx.fillText(value, position.x, position.y);
-                    } else { // Line Chart
+                    } else { 
+                        // Bar Chart Labels
                         ctx.textBaseline = 'bottom';
-                        ctx.fillStyle = dataset.borderColor; 
-                        ctx.fillText(value, position.x, position.y - 10);
+                        ctx.fillStyle = '#444'; 
+                        ctx.fillText(value, position.x, position.y - 5);
                     }
                 });
             });
@@ -1348,7 +1275,7 @@ function renderPKBM(list) {
         }
     };
 
-    // Chart: Rasio Pendidik vs Siswa
+    // Chart Rasio (Pie)
     new Chart(document.getElementById('chartRatioPKBM').getContext('2d'), {
         type: 'pie',
         data: {
@@ -1360,56 +1287,207 @@ function renderPKBM(list) {
             }]
         },
         options: { 
-            responsive: true, 
-            maintainAspectRatio: false, 
+            responsive: true, maintainAspectRatio: false, 
             plugins: { 
                 legend: { position: 'bottom' },
-                tooltip: {
-                    callbacks: {
-                        label: function(context) {
-                            return ` ${context.label}: ${context.raw} Orang`;
-                        }
-                    }
-                } 
+                tooltip: { callbacks: { label: function(c) { return ` ${c.label}: ${c.raw} Orang`; } } } 
             } 
         },
         plugins: [dataLabelsPlugin]
     });
 
-    // C. Chart Siswa vs Lulusan (LINE CHART + MULTI TAHUN)
-    new Chart(document.getElementById('chartSiswaLulus').getContext('2d'), {
-        type: 'line',
-        data: {
-            labels: ['Paket A (SD)', 'Paket B (SMP)', 'Paket C (SMA)'],
-            datasets: chartDatasets
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            interaction: {
-                mode: 'index',
-                intersect: false,
-            },
-            layout: {
-                padding: { top: 30 }
-            },
-            scales: {
-                y: { 
-                    beginAtZero: true, 
-                    grid: { borderDash: [2, 4] },
-                    suggestedMax: Math.max(totalSiswa, totalLulus) * 0.5 
-                },
-                x: { grid: { display: false } }
-            },
-            plugins: { 
-                legend: { 
-                    position: 'top',
-                    labels: { usePointStyle: true, boxWidth: 8 }
-                }
-            }
-        },
-        plugins: [dataLabelsPlugin]
+    // --- 8. LOGIKA BAR CHART UTAMA (REVISI TOTAL) ---
+    let mainChartInstance = null;
+    const selectFilterTahun = document.getElementById('filterTahunPKBM');
+    const selectFilterKat = document.getElementById('filterKategoriPKBM');
+    const containerFilterKat = document.getElementById('filterKategoriContainer');
+
+    // Helper: Generate Dataset Object
+    const createDataset = (label, data, colorInfo) => ({
+        label: label,
+        data: data,
+        backgroundColor: colorInfo.bg,
+        borderColor: colorInfo.border,
+        borderWidth: 1,
+        borderRadius: 4,
+        barPercentage: 0.7,
+        categoryPercentage: 0.8
     });
+
+    // Warna untuk Paket A, B, C (Biru untuk Siswa, Hijau untuk Lulusan)
+   const colors = {
+    siswa: {
+        A: { bg: 'rgba(99, 102, 241, 0.8)', border: '#6366f1' }, // Indigo
+        B: { bg: 'rgba(79, 70, 229, 0.6)', border: '#4f46e5' }, // Indigo lebih gelap
+        C: { bg: 'rgba(129, 140, 248, 0.5)', border: '#818cf8' } // Indigo terang
+    },
+    lulusan: {
+        A: { bg: 'rgba(245, 158, 11, 0.8)', border: '#f59e0b' }, // Amber
+        B: { bg: 'rgba(234, 88, 12, 0.7)', border: '#ea580c' },  // Orange
+        C: { bg: 'rgba(239, 68, 68, 0.6)', border: '#ef4444' }   // Red
+    }
+};
+
+    const renderMainChart = (tahunVal, kategoriVal) => {
+        const ctx = document.getElementById('chartSiswaLulus').getContext('2d');
+        if (mainChartInstance) mainChartInstance.destroy();
+
+        let labels = [];
+        let datasets = [];
+
+        // --- SKENARIO 1: TAMPILKAN SEMUA TAHUN (TREND) ---
+        if (tahunVal === 'all') {
+            // Urutkan data berdasarkan tahun Ascending (Lama ke Baru)
+            const sortedList = [...list].sort((a, b) => a.tahun - b.tahun);
+            
+            // Sumbu X adalah Tahun
+            labels = sortedList.map(item => item.tahun);
+
+            // Siapkan array data
+            let dataSiswaA = [], dataSiswaB = [], dataSiswaC = [];
+            let dataLulusA = [], dataLulusB = [], dataLulusC = [];
+
+            sortedList.forEach(item => {
+                dataSiswaA.push(parseInt(item.siswa_a)||0);
+                dataSiswaB.push(parseInt(item.siswa_b)||0);
+                dataSiswaC.push(parseInt(item.siswa_c)||0);
+                
+                dataLulusA.push(parseInt(item.lulus_a)||0);
+                dataLulusB.push(parseInt(item.lulus_b)||0);
+                dataLulusC.push(parseInt(item.lulus_c)||0);
+            });
+
+            // Push dataset berdasarkan Filter Kategori
+            if (kategoriVal === 'semua' || kategoriVal === 'siswa') {
+                datasets.push(createDataset('Paket A', dataSiswaA, colors.siswa.A));
+                datasets.push(createDataset('Paket B', dataSiswaB, colors.siswa.B));
+                datasets.push(createDataset('Paket C', dataSiswaC, colors.siswa.C));
+            }
+
+            if (kategoriVal === 'semua' || kategoriVal === 'lulusan') {
+                datasets.push(createDataset('Lulusan A', dataLulusA, colors.lulusan.A));
+                datasets.push(createDataset('Lulusan B', dataLulusB, colors.lulusan.B));
+                datasets.push(createDataset('Lulusan C', dataLulusC, colors.lulusan.C));
+            }
+        } 
+        
+        // --- SKENARIO 2: TAMPILKAN SATU TAHUN SPESIFIK ---
+        else {
+            const item = list.find(d => d.tahun == tahunVal);
+            // Sumbu X adalah Kategori Paket
+            labels = ['Paket A (SD)', 'Paket B (SMP)', 'Paket C (SMA)'];
+            
+            if (item) {
+                // Dataset 1: Siswa Aktif
+                datasets.push({
+                    label: 'Siswa Aktif',
+                    data: [parseInt(item.siswa_a)||0, parseInt(item.siswa_b)||0, parseInt(item.siswa_c)||0],
+                    backgroundColor: colors.siswa.A.bg,
+                    borderColor: colors.siswa.A.border,
+                    borderWidth: 1
+                });
+                
+                // Dataset 2: Lulusan
+                datasets.push({
+                    label: 'Lulusan',
+                    data: [parseInt(item.lulus_a)||0, parseInt(item.lulus_b)||0, parseInt(item.lulus_c)||0],
+                    backgroundColor: colors.lulusan.A.bg,
+                    borderColor: colors.lulusan.A.border,
+                    borderWidth: 1
+                });
+            }
+        }
+
+        // Render Config
+        mainChartInstance = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: datasets
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: {
+                    mode: 'index', // Tooltip muncul untuk semua bar di index X yang sama
+                    intersect: false,
+                },
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                    tooltip: {
+                        callbacks: {
+                            title: function(context) {
+                                if (tahunVal === 'all') {
+                                    return `Tahun ${context[0].label}`;
+                                }
+                                return context[0].label;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: tahunVal === 'all' ? 'Tahun Ajaran' : 'Program Paket'
+                        },
+                        grid: { display: false }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Jumlah Orang'
+                        },
+                        grid: { borderDash: [2, 2] }
+                    }
+                }
+            },
+            plugins: [dataLabelsPlugin]
+        });
+    };
+
+    // --- SETUP INTERAKSI FILTER ---
+    if (selectFilterTahun) {
+        // Ambil tahun unik & urutkan descending
+        const uniqueYears = [...new Set(list.map(item => item.tahun).filter(t => t))].sort((a, b) => b - a);
+
+        // Isi Dropdown Tahun
+        uniqueYears.forEach(year => {
+            let option = document.createElement('option');
+            option.value = year;
+            option.text = year;
+            selectFilterTahun.appendChild(option);
+        });
+
+        // Event Listener Tahun
+        selectFilterTahun.addEventListener('change', function() {
+            const val = this.value;
+            // Tampilkan/Sembunyikan Filter Kategori berdasarkan pilihan tahun
+            if (val === 'all') {
+                containerFilterKat.style.display = 'block';
+                renderMainChart('all', selectFilterKat.value);
+            } else {
+                containerFilterKat.style.display = 'none'; // Sembunyikan kategori jika melihat detail per tahun
+                renderMainChart(val, 'semua'); // Default render semua dataset (Siswa vs Lulus) untuk mode single year
+            }
+        });
+
+        // Event Listener Kategori
+        selectFilterKat.addEventListener('change', function() {
+            // Hanya ngefek jika Tahun = All
+            if (selectFilterTahun.value === 'all') {
+                renderMainChart('all', this.value);
+            }
+        });
+
+        // Render Awal (Default: Semua Tahun, Semua Kategori)
+        selectFilterTahun.value = 'all';
+        selectFilterKat.value = 'semua';
+        renderMainChart('all', 'semua');
+    }
 }
 
 // ==========================================
@@ -1521,7 +1599,7 @@ function renderKlinik(list) {
         </div>
         
         <div class="col-lg-4" data-aos="fade-left">
-            <div class="card h-100 border-0 shadow-sm rounded-4 p-4 bg-primary text-white position-relative overflow-hidden d-flex flex-column justify-content-center">
+            <div class="card h-100 border-0 shadow-sm rounded-4 p-4 bg-danger text-white position-relative overflow-hidden d-flex flex-column justify-content-center">
                 
                 ${logoUrl ? `
                 <div class="text-center mb-3 position-relative" style="z-index: 2;">
@@ -1565,13 +1643,13 @@ function renderKlinik(list) {
                         </div>
                     </a>
 
-                    <a href="javascript:void(0);" onclick="openDocPreview('Standar Operasional', '${mainData.url_sop || ''}')" class="btn btn-warning text-dark text-start py-2 hover-scale border-0 shadow-sm">
+                    <a href="javascript:void(0);" onclick="openDocPreview('Standar Operasional Prosedur', '${mainData.url_sop || ''}')" class="btn btn-warning text-dark text-start py-2 hover-scale border-0 shadow-sm">
                         <div class="d-flex align-items-center">
                             <div class="bg-white bg-opacity-25 rounded-circle p-2 me-3" style="width: 45px; height: 45px; display: flex; align-items: center; justify-content: center;">
                                 <i class="fas fa-book-reader fs-5"></i>
                             </div>
                             <div class="lh-sm overflow-hidden">
-                                <small class="d-block text-dark-50" style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px;">Standar Operasional</small>
+                                <small class="d-block text-dark-50" style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px;">Standar Operasional Prosedur</small>
                                 <span class="fw-bold small text-truncate d-block">${mainData.sop || 'Dokumen SOP'}</span>
                             </div>
                         </div>

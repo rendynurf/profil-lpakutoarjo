@@ -71,7 +71,7 @@
                         <a class="nav-link dropdown-toggle active" href="#" data-bs-toggle="dropdown">Layanan</a>
                         <ul class="dropdown-menu">
                             <li><a class="dropdown-item" href="pkbm.html">PKBM (Pendidikan)</a></li>
-                            <li><a class="dropdown-item" href="klinik.html">Klinik Anak</a></li>
+                            <li><a class="dropdown-item" href="klinik.html">Klinik Pratama</a></li>
                             <li><hr class="dropdown-divider"></li>
                             <li><a class="dropdown-item" href="kunjungan.html">Kunjungan</a></li>
                             <li><a class="dropdown-item" href="reintegrasi.html">Reintegrasi</a></li>
@@ -108,6 +108,21 @@
             </div>
         </div>
     </main>
+
+    <!-- Modal untuk Preview Dokumen -->
+<div class="modal fade" id="docPreviewModal" tabindex="-1" aria-labelledby="docModalTitle" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="docModalTitle">Preview Dokumen</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <iframe id="docFrame" src="" width="100%" height="500px" frameborder="0"></iframe>
+            </div>
+        </div>
+    </div>
+</div>
 
     <footer><div class="container text-center"><p>Copyright © 2026 LPKA Kelas I Kutoarjo</p></div></footer>
     <div class="btn-float-container">
