@@ -1183,20 +1183,6 @@ function renderPKBM(list) {
                 </div>
             </div>
         </div>
-        <div class="col-md-6 col-lg-4" data-aos="zoom-in" data-aos-delay="300">
-            <div class="card border-0 shadow-sm rounded-4 h-100">
-                <div class="card-header bg-white fw-bold text-center py-3 border-bottom text-warning">
-                    <i class="fas fa-users me-2"></i>Rasio Pendidikan
-                </div>
-                <div class="card-body p-3">
-                    <div style="height: 220px; position: relative;">
-                        <canvas id="chartRatioPKBM"></canvas>
-                    </div>
-                    <div class="text-center mt-3 pt-3 border-top">
-                        <h4 class="fw-bold text-dark mb-0">${ratioText}</h4>
-                        <small class="text-muted fw-bold">Rasio (Tenaga Pendidik : Siswa Aktif)</small>
-                    </div>
-                </div>
             </div>
         </div>
     </div>
