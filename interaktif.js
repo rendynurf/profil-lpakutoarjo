@@ -551,86 +551,101 @@ function renderBanner(list) {
     container.innerHTML = html;
 }
 
-/* --- FUNGSI RENDER SEJARAH (FIXED POSISI GAMBAR) --- */
+/* --- FUNGSI RENDER SEJARAH (VERSI PERBAIKAN) --- */
 function renderSejarah(list) {
     const container = document.getElementById('sejarah-container');
     const loadingElement = document.getElementById('loading-sejarah'); 
     
-    // Cek Data Valid
+    // 1. Cek Validitas Data
     if (!list || list.length === 0) { 
-        container.innerHTML = '<div class="text-center">Data sejarah belum tersedia.</div>'; 
+        container.innerHTML = '<div class="text-center py-5">Data sejarah belum tersedia.</div>'; 
         if (loadingElement) loadingElement.style.display = 'none'; 
         return; 
     }
     
     const item = list[0]; 
     
-    // 1. AMBIL DATA GAMBAR
-    // Gambar Utama (Header)
-    let imgUtama = fixGoogleDriveImage(item.gambarutama || item.gambarUtama || item.image || "");
-    // Gambar Tengah 1 (Disisipkan di 1/3 paragraf)
-    let imgTengah1 = fixGoogleDriveImage(item.gambartengah1 || "");
-    // Gambar Tengah 2 (Disisipkan di 2/3 paragraf)
-    let imgTengah2 = fixGoogleDriveImage(item.gambartengah2 || item.gambarTengah2 || "");
+    // 2. AMBIL & BERSIHKAN DATA GAMBAR
+    // Menggunakan .trim() untuk memastikan tidak ada spasi liar dari Spreadsheet
+    const cleanLink = (link) => link ? link.toString().trim() : "";
     
-    // 2. HEADER HALAMAN (Judul & Gambar Utama)
-    // Bagian ini dirender di awal sebelum loop paragraf
-    let headerHtml = `
+    let imgUtama = fixGoogleDriveImage(cleanLink(item.gambarutama || item.gambarUtama || item.image));
+    let imgTengah1 = fixGoogleDriveImage(cleanLink(item.gambartengah1 || item.gambarTengah1));
+    let imgTengah2 = fixGoogleDriveImage(cleanLink(item.gambartengah2 || item.gambarTengah2));
+    
+    // Debugging di Console
+    console.log("Link Gambar 1:", imgTengah1);
+    
+    // 3. HEADER HALAMAN
+    let htmlOutput = `
         <div class="row justify-content-center">
             <div class="col-lg-10">
                 <h2 class="fw-bold text-primary mb-4 text-center">${item.judul || 'Sejarah LPKA'}</h2>
                 
                 ${imgUtama ? `
                 <div class="mb-5 text-center">
-                    <img src="${imgUtama}" class="img-fluid rounded-4 shadow-lg" style="max-height:500px; width:100%; object-fit:cover;" alt="Gambar Utama" onerror="this.parentElement.style.display='none'">
+                    <img src="${imgUtama}" class="img-fluid rounded-4 shadow-lg" 
+                         style="max-height:500px; width:100%; object-fit:cover;" 
+                         alt="Gambar Utama" 
+                         onerror="this.parentElement.style.display='none'">
                 </div>` : ''}
                 
                 <div class="text-secondary fs-5">
     `;
 
-    // 3. PROSES PARAGRAF & SISIP GAMBAR
-    // Ambil deskripsi dan pecah jadi array per baris baru
-    let paragraphs = (item.deskripsisejarah || item.deskripsi_sejarah || item.deskripsi || item.konten || "").toString().split(/\r?\n/).filter(p => p.trim() !== "");
-    let contentHtml = "";
+    // 4. PROSES PARAGRAF
+    let rawContent = item.deskripsisejarah || item.deskripsi_sejarah || item.deskripsi || item.konten || "";
+    let paragraphs = rawContent.toString().split(/\r?\n/).filter(p => p.trim() !== "");
+    let totalPara = paragraphs.length;
+
+    // Tentukan titik sisip (Contoh: Paragraf ke-2 dan Paragraf ke-5)
+    // Atau gunakan logika dinamis:
+    let idx1 = Math.floor(totalPara / 3); 
+    let idx2 = Math.floor(2 * totalPara / 3);
+
+    if (totalPara > 0) {
+        paragraphs.forEach((p, i) => {
+            // Tambahkan Teks Paragraf
+            htmlOutput += `<p class="lh-lg mb-3" style="text-align:justify;">${p}</p>`;
+            
+            // Sisipkan Gambar Tengah 1 setelah paragraf idx1
+            if (imgTengah1 && i === idx1) {
+                htmlOutput += `
+                <div class="row justify-content-center my-4">
+                    <div class="col-md-11 text-center">
+                        <img src="${imgTengah1}" class="img-fluid rounded-3 shadow-sm w-100" 
+                             style="max-height: 450px; object-fit: contain; display: block !important;" 
+                             alt="Dokumentasi Sejarah 1" 
+                             onerror="console.error('Gagal load Gambar Tengah 1'); this.closest('.row').style.display='none'">
+                    </div>
+                </div>`;
+            }
+            
+            // Sisipkan Gambar Tengah 2 setelah paragraf idx2
+            if (imgTengah2 && i === idx2 && idx2 !== idx1) {
+                htmlOutput += `
+                <div class="row justify-content-center my-4">
+                    <div class="col-md-11 text-center">
+                        <img src="${imgTengah2}" class="img-fluid rounded-3 shadow-sm w-100" 
+                             style="max-height: 450px; object-fit: contain; display: block !important;" 
+                             alt="Dokumentasi Sejarah 2" 
+                             onerror="this.closest('.row').style.display='none'">
+                    </div>
+                </div>`;
+            }
+        });
+    } else {
+        // Jika tidak ada teks sama sekali tapi ada gambar tengah
+        if (imgTengah1) htmlOutput += `<img src="${imgTengah1}" class="img-fluid mb-3">`;
+        if (imgTengah2) htmlOutput += `<img src="${imgTengah2}" class="img-fluid">`;
+    }
+
+    // Penutup Tag
+    htmlOutput += `</div></div></div>`;
     
-    // Hitung posisi penyisipan gambar (mirip renderDetailBerita)
-    let idx1 = Math.floor(paragraphs.length / 3); 
-    let idx2 = Math.floor(2 * paragraphs.length / 3);
+    // Render ke DOM
+    container.innerHTML = htmlOutput;
     
-    paragraphs.forEach((p, i) => {
-        // Tambahkan paragraf teks
-        contentHtml += `<p class="lh-lg mb-3" style="text-align:justify;">${p}</p>`;
-        
-        // --- SISIPKAN GAMBAR TENGAH 1 ---
-        // Logika: Jika index saat ini == idx1 DAN gambar tersedia
-        if (i === idx1 && imgTengah1) {
-            contentHtml += `
-            <div class="row justify-content-center my-4" data-aos="fade-up">
-                <div class="col-md-10 text-center">
-                    <img src="${imgTengah1}" class="img-fluid rounded-3 shadow-sm w-100" style="max-height: 450px; object-fit: contain;" alt="Dokumentasi Sejarah 1" 
-                         onerror="this.closest('.row').style.display='none'">
-                </div>
-            </div>`;
-        }
-        
-        // --- SISIPKAN GAMBAR TENGAH 2 ---
-        // Logika: Jika index saat ini == idx2 DAN gambar tersedia
-        // (Ditambah cek idx2 !== idx1 agar tidak numpuk jika teks sangat pendek)
-        if (i === idx2 && imgTengah2 && idx2 !== idx1) {
-            contentHtml += `
-            <div class="row justify-content-center my-4" data-aos="fade-up">
-                <div class="col-md-10 text-center">
-                    <img src="${imgTengah2}" class="img-fluid rounded-3 shadow-sm w-100" style="max-height: 450px; object-fit: contain;" alt="Dokumentasi Sejarah 2" 
-                         onerror="this.closest('.row').style.display='none'">
-                </div>
-            </div>`;
-        }
-    });
-    
-    // 4. GABUNGKAN SEMUA KE CONTAINER
-    // Header + Isi Konten + Penutup Div
-    container.innerHTML = headerHtml + contentHtml + `</div></div></div>`;
-        
     if (loadingElement) loadingElement.style.display = 'none';
 }
 function renderPejabat(list) {
@@ -645,11 +660,106 @@ function renderPejabatFull(list) {
     const container = document.getElementById('pejabat-full-container');
     if(!container) return;
     container.innerHTML = '';
-    if(!list || list.length === 0) { container.innerHTML = '<div class="col-12 text-center">Data pejabat belum tersedia.</div>'; return; }
+    if(!list || list.length === 0) { 
+        container.innerHTML = '<div class="col-12 text-center">Data pejabat belum tersedia.</div>'; 
+        return; 
+    }
+    
     let html = '';
-    list.forEach((p, idx) => { html += `<div class="col-md-6 col-lg-3" data-aos="fade-up" data-aos-delay="${idx * 100}"><div class="card card-pejabat"><div class="card-pejabat-img-wrapper"><img src="${fixGoogleDriveImage(p.foto)}" class="card-pejabat-img"></div><div class="card-pejabat-body"><h5 class="fw-bold text-primary mb-1 text-truncate">${p.nama}</h5><small class="text-muted fw-bold text-uppercase">${p.jabatan}</small></div></div></div>`; });
+    
+// --- CARD BESAR 1: Pejabat Tertinggi (Versi Lebih Compact) ---
+if (list.length > 0) {
+    const p1 = list[0];
+    html += `
+    <div class="col-12 mb-4" data-aos="fade-up">
+        <div class="card border-0 shadow-sm rounded-4 overflow-hidden mx-auto" style="max-width: 900px;"> 
+            <div class="row g-0 align-items-center">
+                <div class="col-md-4 bg-light text-center">
+                    <img src="${fixGoogleDriveImage(p1.foto)}" 
+                         class="img-fluid" 
+                         style="height: 300px; width: 100%; object-fit: contain; padding: 15px;" 
+                         alt="${p1.nama}">
+                </div>
+                <div class="col-md-8 p-4 text-center text-md-start">
+                    <h3 class="fw-bold text-dark mb-2">${p1.nama}</h3>
+                    <div class="bg-primary d-inline-block px-3 py-1 rounded-pill">
+                        <span class="text-white mb-0 small" style="font-weight: 500;">${p1.jabatan}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>`;
+}
+    
+// --- CARD BESAR 2: 5 Pejabat Utama (Responsif Grid) ---
+const start2 = 1;
+const end2 = Math.min(6, list.length);
+
+if (end2 > start2) {
+    html += `
+    <div class="col-12 mb-5" data-aos="fade-up" data-aos-delay="100">
+        <h5 class="fw-bold text-primary mb-4 text-center">Eselon IVA</h5>
+        
+        <div class="row row-cols-2 row-cols-md-3 row-cols-lg-5 g-3 justify-content-center">`;
+    
+    for (let i = start2; i < end2; i++) {
+        const p = list[i];
+        html += `
+            <div class="col">
+                <div class="card card-pejabat h-100 border-0 shadow-sm rounded-4 overflow-hidden">
+                    <div class="ratio ratio-1x1 bg-light">
+                        <img src="${fixGoogleDriveImage(p.foto)}" 
+                             class="card-img-top" 
+                             style="object-fit: contain; padding: 5px;" 
+                             alt="${p.nama}">
+                    </div>
+                    <div class="card-body text-center p-2 p-md-3">
+                        <h6 class="fw-bold text-primary mb-1 text-truncate" style="font-size: 0.9rem;">${p.nama}</h6>
+                        <small class="text-muted d-block text-uppercase" style="font-size: 0.65rem; line-height: 1.2;">${p.jabatan}</small>
+                    </div>
+                </div>
+            </div>`;
+    }
+    html += `
+        </div>
+    </div>`;
+}
+    
+// --- CARD BESAR 3: Eselon V (Grid Simetris - Baris 2 Rata Tengah) ---
+const start3 = 6;
+if (list.length > start3) {
+    html += `
+    <div class="col-12 mb-4" data-aos="fade-up" data-aos-delay="200">
+        <h5 class="fw-bold text-primary mb-4 text-center">Eselon V</h5>
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-5 g-3 justify-content-center">`;
+    
+    for (let i = start3; i < list.length; i++) {
+        const p = list[i];
+        html += `
+            <div class="col">
+                <div class="card card-pejabat h-100 border-0 shadow-sm rounded-4 overflow-hidden">
+                    <div class="ratio ratio-1x1 bg-light">
+                        <img src="${fixGoogleDriveImage(p.foto)}" 
+                             class="card-img-top" 
+                             style="object-fit: contain; padding: 10px;" 
+                             alt="${p.nama}">
+                    </div>
+                    <div class="card-body text-center p-3">
+                        <h6 class="fw-bold text-primary mb-1 text-truncate" title="${p.nama}">${p.nama}</h6>
+                        <small class="text-muted d-block text-uppercase" style="font-size: 0.7rem; font-weight: 600;">${p.jabatan}</small>
+                    </div>
+                </div>
+            </div>`;
+    }
+    
+    html += `
+        </div>
+    </div>`;
+}
+    
     container.innerHTML = html;
 }
+
 
 function renderVisiMisi(list) {
     const container = document.getElementById('visimisi-content-container');
@@ -1030,7 +1140,6 @@ function renderPKBM(list) {
     }
 
     // --- 2. PERSIAPAN DATA UMUM (HEADER) ---
-    // Mengambil data terbaru (index 0 karena asumsi sort descending)
     const data = list[0]; 
 
     // Data Statistik Header
@@ -1041,22 +1150,12 @@ function renderPKBM(list) {
     let gd = parseInt(data.guru_diploma) || 0;
     let gs = parseInt(data.guru_strata) || 0;
     
-    // Total Data Terbaru
     let totalSiswa = (parseInt(data.siswa_a)||0) + (parseInt(data.siswa_b)||0) + (parseInt(data.siswa_c)||0);
     
-    // Hitung Rasio
-    let ratioText = "Data Belum Lengkap";
-    if (totalGuru > 0 && totalSiswa > 0) {
-        let ratioVal = Math.round(totalSiswa / totalGuru);
-        ratioText = `1 : ${ratioVal}`;
-    } else if (totalGuru > 0 && totalSiswa === 0) {
-        ratioText = "-"; 
-    }
-
     let logoUrl = fixGoogleDriveImage(data.logo);
     let html = '';
 
-    // --- 3. HTML STRUKTUR (DESKRIPSI TETAP DIPERTAHANKAN) ---
+    // --- 3. HTML STRUKTUR ---
     html += `
     <div class="row g-4 mb-5">
         <div class="col-lg-8" data-aos="fade-right">
@@ -1076,7 +1175,6 @@ function renderPKBM(list) {
         
         <div class="col-lg-4" data-aos="fade-left">
             <div class="card h-100 border-0 shadow-sm rounded-4 p-4 bg-primary text-white position-relative overflow-hidden d-flex flex-column justify-content-center">
-                
                 ${logoUrl ? `
                 <div class="text-center mb-3 position-relative" style="z-index: 2;">
                     <div class="d-inline-block bg-white p-3 rounded-circle shadow-sm">
@@ -1087,11 +1185,9 @@ function renderPKBM(list) {
                 <div class="text-center position-relative mb-4" style="z-index: 2;">
                     <h5 class="fw-bold mb-1 ls-1">PKBM TUNAS MEKAR AMAN</h5>
                     <h6 class="fw-bold mb-2 ls-1 opacity-75">LPKA KLAS I KUTOARJO</h6>
-                    
                     <span class="badge bg-warning text-dark fw-bold mb-3 px-3 py-2 rounded-pill">
                         <i class="fas fa-star me-1"></i> Terakreditasi B
                     </span>
-                    
                     <div style="width: 60px; height: 3px; background: #fff; margin: 0 auto;"></div>
                 </div>
 
@@ -1140,12 +1236,12 @@ function renderPKBM(list) {
         html += renderGallerySlider(galeriData, "Galeri Kegiatan PKBM", "pkbmGallery", "primary");
     }
 
-    // --- 5. TABEL STATISTIK ---
+    // --- 5. TABEL STATISTIK (Update: 2 Kolom Simetris) ---
     html += `
     <h4 class="fw-bold text-center text-dark mb-4 mt-5" data-aos="fade-up">Statistik Tenaga Kependidikan</h4>
     
     <div class="row g-4 mb-5 justify-content-center">
-        <div class="col-md-6 col-lg-4" data-aos="zoom-in" data-aos-delay="100">
+        <div class="col-md-6 col-lg-5" data-aos="zoom-in" data-aos-delay="100">
             <div class="card border-0 shadow-sm rounded-4 h-100">
                 <div class="card-header bg-white fw-bold text-center py-3 border-bottom text-primary">
                     <i class="fas fa-venus-mars me-2"></i>Gender Pendidik <span class="badge bg-secondary rounded-pill ms-2">Total: ${totalGuru}</span>
@@ -1164,7 +1260,7 @@ function renderPKBM(list) {
                 </div>
             </div>
         </div>
-        <div class="col-md-6 col-lg-4" data-aos="zoom-in" data-aos-delay="200">
+        <div class="col-md-6 col-lg-5" data-aos="zoom-in" data-aos-delay="200">
             <div class="card border-0 shadow-sm rounded-4 h-100">
                 <div class="card-header bg-white fw-bold text-center py-3 border-bottom text-success">
                     <i class="fas fa-graduation-cap me-2"></i>Pendidikan Guru
@@ -1183,22 +1279,6 @@ function renderPKBM(list) {
                 </div>
             </div>
         </div>
-        <div class="col-md-6 col-lg-4" data-aos="zoom-in" data-aos-delay="300">
-            <div class="card border-0 shadow-sm rounded-4 h-100">
-                <div class="card-header bg-white fw-bold text-center py-3 border-bottom text-warning">
-                    <i class="fas fa-users me-2"></i>Rasio Pendidikan
-                </div>
-                <div class="card-body p-3">
-                    <div style="height: 220px; position: relative;">
-                        <canvas id="chartRatioPKBM"></canvas>
-                    </div>
-                    <div class="text-center mt-3 pt-3 border-top">
-                        <h4 class="fw-bold text-dark mb-0">${ratioText}</h4>
-                        <small class="text-muted fw-bold">Rasio (Tenaga Pendidik : Siswa Aktif)</small>
-                    </div>
-                </div>
-            </div>
-        </div>
     </div>
 
     <div class="row mb-5" data-aos="fade-up">
@@ -1206,7 +1286,6 @@ function renderPKBM(list) {
             <div class="card border-0 shadow-sm rounded-4 p-4">
                 <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
                     <h5 class="fw-bold text-primary m-0"><i class="fas fa-chart-line me-2"></i>Grafik Data Warga Belajar</h5>
-                    
                     <div class="d-flex align-items-center gap-2 flex-wrap">
                         <div id="filterKategoriContainer" style="display: block;">
                             <select id="filterKategoriPKBM" class="form-select form-select-sm border-secondary fw-bold" style="width: auto; min-width: 120px;">
@@ -1215,7 +1294,6 @@ function renderPKBM(list) {
                                 <option value="lulusan">Hanya Lulusan</option>
                             </select>
                         </div>
-                        
                         <select id="filterTahunPKBM" class="form-select form-select-sm border-primary text-primary fw-bold" style="width: auto; min-width: 140px;">
                             <option value="all">Semua Tahun</option>
                         </select>
@@ -1224,16 +1302,13 @@ function renderPKBM(list) {
                 <div style="height: 400px; width: 100%;">
                     <canvas id="chartSiswaLulus"></canvas>
                 </div>
-                <div class="mt-2 text-center text-muted small fst-italic">
-                    <i class="fas fa-info-circle me-1"></i> Data dikelompokkan berdasarkan Paket A, B, dan C.
-                </div>
             </div>
         </div>
     </div>`;
 
     container.innerHTML = html;
 
-    // --- 7. INISIALISASI PLUGIN & CHART PIE (Sama seperti sebelumnya) ---
+    // --- 6. INISIALISASI PLUGIN ---
     const carouselEl = document.getElementById('pkbmGallery');
     if(carouselEl && typeof bootstrap !== 'undefined') {
         new bootstrap.Carousel(carouselEl, { interval: 5000, wrap: true, pause: 'hover' });
@@ -1253,80 +1328,36 @@ function renderPKBM(list) {
                 meta.data.forEach((element, index) => {
                     const value = dataset.data[index];
                     if (value === 0 || value === null || value === undefined) return;
-                    const fontSize = 11;
-                    ctx.font = `bold ${fontSize}px sans-serif`;
+                    ctx.font = `bold 11px sans-serif`;
                     ctx.textAlign = 'center';
                     let position = element.tooltipPosition();
-                    
-                    if (meta.type === 'doughnut' || meta.type === 'pie') {
-                        ctx.textBaseline = 'middle';
-                        ctx.fillStyle = '#fff'; 
-                        ctx.strokeText(value, position.x, position.y);
-                        ctx.fillText(value, position.x, position.y);
-                    } else { 
-                        // Bar Chart Labels
-                        ctx.textBaseline = 'bottom';
-                        ctx.fillStyle = '#444'; 
-                        ctx.fillText(value, position.x, position.y - 5);
-                    }
+                    ctx.textBaseline = 'bottom';
+                    ctx.fillStyle = '#444'; 
+                    ctx.fillText(value, position.x, position.y - 5);
                 });
             });
             ctx.restore();
         }
     };
 
-    // Chart Rasio (Pie)
-    new Chart(document.getElementById('chartRatioPKBM').getContext('2d'), {
-        type: 'pie',
-        data: {
-            labels: ['Tenaga Pendidik', 'Siswa Aktif'],
-            datasets: [{
-                data: [totalGuru, totalSiswa],
-                backgroundColor: ['#0d6efd', '#fd7e14'], 
-                hoverOffset: 4
-            }]
-        },
-        options: { 
-            responsive: true, maintainAspectRatio: false, 
-            plugins: { 
-                legend: { position: 'bottom' },
-                tooltip: { callbacks: { label: function(c) { return ` ${c.label}: ${c.raw} Orang`; } } } 
-            } 
-        },
-        plugins: [dataLabelsPlugin]
-    });
-
-    // --- 8. LOGIKA BAR CHART UTAMA (REVISI TOTAL) ---
+    // --- 7. LOGIKA BAR CHART UTAMA ---
     let mainChartInstance = null;
     const selectFilterTahun = document.getElementById('filterTahunPKBM');
     const selectFilterKat = document.getElementById('filterKategoriPKBM');
     const containerFilterKat = document.getElementById('filterKategoriContainer');
 
-    // Helper: Generate Dataset Object
-    const createDataset = (label, data, colorInfo) => ({
-        label: label,
-        data: data,
-        backgroundColor: colorInfo.bg,
-        borderColor: colorInfo.border,
-        borderWidth: 1,
-        borderRadius: 4,
-        barPercentage: 0.7,
-        categoryPercentage: 0.8
-    });
-
-    // Warna untuk Paket A, B, C (Biru untuk Siswa, Hijau untuk Lulusan)
-   const colors = {
-    siswa: {
-        A: { bg: 'rgba(99, 102, 241, 0.8)', border: '#6366f1' }, // Indigo
-        B: { bg: 'rgba(79, 70, 229, 0.6)', border: '#4f46e5' }, // Indigo lebih gelap
-        C: { bg: 'rgba(129, 140, 248, 0.5)', border: '#818cf8' } // Indigo terang
-    },
-    lulusan: {
-        A: { bg: 'rgba(245, 158, 11, 0.8)', border: '#f59e0b' }, // Amber
-        B: { bg: 'rgba(234, 88, 12, 0.7)', border: '#ea580c' },  // Orange
-        C: { bg: 'rgba(239, 68, 68, 0.6)', border: '#ef4444' }   // Red
-    }
-};
+    const colors = {
+        siswa: {
+            A: { bg: 'rgba(99, 102, 241, 0.8)', border: '#6366f1' },
+            B: { bg: 'rgba(79, 70, 229, 0.6)', border: '#4f46e5' },
+            C: { bg: 'rgba(129, 140, 248, 0.5)', border: '#818cf8' }
+        },
+        lulusan: {
+            A: { bg: 'rgba(245, 158, 11, 0.8)', border: '#f59e0b' },
+            B: { bg: 'rgba(234, 88, 12, 0.7)', border: '#ea580c' },
+            C: { bg: 'rgba(239, 68, 68, 0.6)', border: '#ef4444' }
+        }
+    };
 
     const renderMainChart = (tahunVal, kategoriVal) => {
         const ctx = document.getElementById('chartSiswaLulus').getContext('2d');
@@ -1335,157 +1366,80 @@ function renderPKBM(list) {
         let labels = [];
         let datasets = [];
 
-        // --- SKENARIO 1: TAMPILKAN SEMUA TAHUN (TREND) ---
         if (tahunVal === 'all') {
-            // Urutkan data berdasarkan tahun Ascending (Lama ke Baru)
             const sortedList = [...list].sort((a, b) => a.tahun - b.tahun);
-            
-            // Sumbu X adalah Tahun
             labels = sortedList.map(item => item.tahun);
 
-            // Siapkan array data
-            let dataSiswaA = [], dataSiswaB = [], dataSiswaC = [];
-            let dataLulusA = [], dataLulusB = [], dataLulusC = [];
-
-            sortedList.forEach(item => {
-                dataSiswaA.push(parseInt(item.siswa_a)||0);
-                dataSiswaB.push(parseInt(item.siswa_b)||0);
-                dataSiswaC.push(parseInt(item.siswa_c)||0);
-                
-                dataLulusA.push(parseInt(item.lulus_a)||0);
-                dataLulusB.push(parseInt(item.lulus_b)||0);
-                dataLulusC.push(parseInt(item.lulus_c)||0);
+            const createDataset = (label, data, colorInfo) => ({
+                label: label, data: data, backgroundColor: colorInfo.bg,
+                borderColor: colorInfo.border, borderWidth: 1, borderRadius: 4
             });
 
-            // Push dataset berdasarkan Filter Kategori
             if (kategoriVal === 'semua' || kategoriVal === 'siswa') {
-                datasets.push(createDataset('Paket A', dataSiswaA, colors.siswa.A));
-                datasets.push(createDataset('Paket B', dataSiswaB, colors.siswa.B));
-                datasets.push(createDataset('Paket C', dataSiswaC, colors.siswa.C));
+                datasets.push(createDataset('Paket A', sortedList.map(i => parseInt(i.siswa_a)||0), colors.siswa.A));
+                datasets.push(createDataset('Paket B', sortedList.map(i => parseInt(i.siswa_b)||0), colors.siswa.B));
+                datasets.push(createDataset('Paket C', sortedList.map(i => parseInt(i.siswa_c)||0), colors.siswa.C));
             }
-
             if (kategoriVal === 'semua' || kategoriVal === 'lulusan') {
-                datasets.push(createDataset('Lulusan A', dataLulusA, colors.lulusan.A));
-                datasets.push(createDataset('Lulusan B', dataLulusB, colors.lulusan.B));
-                datasets.push(createDataset('Lulusan C', dataLulusC, colors.lulusan.C));
+                datasets.push(createDataset('Lulusan A', sortedList.map(i => parseInt(i.lulus_a)||0), colors.lulusan.A));
+                datasets.push(createDataset('Lulusan B', sortedList.map(i => parseInt(i.lulus_b)||0), colors.lulusan.B));
+                datasets.push(createDataset('Lulusan C', sortedList.map(i => parseInt(i.lulus_c)||0), colors.lulusan.C));
             }
-        } 
-        
-        // --- SKENARIO 2: TAMPILKAN SATU TAHUN SPESIFIK ---
-        else {
+        } else {
             const item = list.find(d => d.tahun == tahunVal);
-            // Sumbu X adalah Kategori Paket
             labels = ['Paket A (SD)', 'Paket B (SMP)', 'Paket C (SMA)'];
-            
             if (item) {
-                // Dataset 1: Siswa Aktif
                 datasets.push({
                     label: 'Siswa Aktif',
                     data: [parseInt(item.siswa_a)||0, parseInt(item.siswa_b)||0, parseInt(item.siswa_c)||0],
-                    backgroundColor: colors.siswa.A.bg,
-                    borderColor: colors.siswa.A.border,
-                    borderWidth: 1
+                    backgroundColor: colors.siswa.A.bg, borderColor: colors.siswa.A.border, borderWidth: 1
                 });
-                
-                // Dataset 2: Lulusan
                 datasets.push({
                     label: 'Lulusan',
                     data: [parseInt(item.lulus_a)||0, parseInt(item.lulus_b)||0, parseInt(item.lulus_c)||0],
-                    backgroundColor: colors.lulusan.A.bg,
-                    borderColor: colors.lulusan.A.border,
-                    borderWidth: 1
+                    backgroundColor: colors.lulusan.A.bg, borderColor: colors.lulusan.A.border, borderWidth: 1
                 });
             }
         }
 
-        // Render Config
         mainChartInstance = new Chart(ctx, {
             type: 'bar',
-            data: {
-                labels: labels,
-                datasets: datasets
-            },
+            data: { labels: labels, datasets: datasets },
             options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                interaction: {
-                    mode: 'index', // Tooltip muncul untuk semua bar di index X yang sama
-                    intersect: false,
-                },
-                plugins: {
-                    legend: {
-                        position: 'top',
-                    },
-                    tooltip: {
-                        callbacks: {
-                            title: function(context) {
-                                if (tahunVal === 'all') {
-                                    return `Tahun ${context[0].label}`;
-                                }
-                                return context[0].label;
-                            }
-                        }
-                    }
-                },
-                scales: {
-                    x: {
-                        title: {
-                            display: true,
-                            text: tahunVal === 'all' ? 'Tahun Ajaran' : 'Program Paket'
-                        },
-                        grid: { display: false }
-                    },
-                    y: {
-                        beginAtZero: true,
-                        title: {
-                            display: true,
-                            text: 'Jumlah Orang'
-                        },
-                        grid: { borderDash: [2, 2] }
-                    }
+                responsive: true, maintainAspectRatio: false,
+                plugins: { legend: { position: 'top' } },
+                scales: { 
+                    y: { beginAtZero: true, grid: { borderDash: [2, 2] } },
+                    x: { grid: { display: false } }
                 }
             },
             plugins: [dataLabelsPlugin]
         });
     };
 
-    // --- SETUP INTERAKSI FILTER ---
+    // --- 8. SETUP FILTER ---
     if (selectFilterTahun) {
-        // Ambil tahun unik & urutkan descending
         const uniqueYears = [...new Set(list.map(item => item.tahun).filter(t => t))].sort((a, b) => b - a);
-
-        // Isi Dropdown Tahun
         uniqueYears.forEach(year => {
             let option = document.createElement('option');
-            option.value = year;
-            option.text = year;
+            option.value = year; option.text = year;
             selectFilterTahun.appendChild(option);
         });
 
-        // Event Listener Tahun
         selectFilterTahun.addEventListener('change', function() {
-            const val = this.value;
-            // Tampilkan/Sembunyikan Filter Kategori berdasarkan pilihan tahun
-            if (val === 'all') {
+            if (this.value === 'all') {
                 containerFilterKat.style.display = 'block';
                 renderMainChart('all', selectFilterKat.value);
             } else {
-                containerFilterKat.style.display = 'none'; // Sembunyikan kategori jika melihat detail per tahun
-                renderMainChart(val, 'semua'); // Default render semua dataset (Siswa vs Lulus) untuk mode single year
+                containerFilterKat.style.display = 'none';
+                renderMainChart(this.value, 'semua');
             }
         });
 
-        // Event Listener Kategori
         selectFilterKat.addEventListener('change', function() {
-            // Hanya ngefek jika Tahun = All
-            if (selectFilterTahun.value === 'all') {
-                renderMainChart('all', this.value);
-            }
+            if (selectFilterTahun.value === 'all') renderMainChart('all', this.value);
         });
 
-        // Render Awal (Default: Semua Tahun, Semua Kategori)
-        selectFilterTahun.value = 'all';
-        selectFilterKat.value = 'semua';
         renderMainChart('all', 'semua');
     }
 }
