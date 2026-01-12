@@ -228,13 +228,13 @@ if (type === 'kunjungan') {
     </div> <!-- Tutup row pertama -->
     <div class="row justify-content-center mt-4"> <!-- Row baru untuk SOP -->
         <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="400">
-            <a href="javascript:void(0);" onclick="openDocPreview('Standar Operasional Prosedur Prosedur', '${data.url_sop || ''}')" class="btn btn-warning text-dark text-start py-2 hover-scale border-0 shadow-sm">
+            <a href="javascript:void(0);" onclick="openDocPreview('Standar Operasional Prosedur', '${data.url_sop || ''}')" class="btn btn-warning text-dark text-start py-2 hover-scale border-0 shadow-sm">
                         <div class="d-flex align-items-center">
                             <div class="bg-white bg-opacity-25 rounded-circle p-2 me-3" style="width: 45px; height: 45px; display: flex; align-items: center; justify-content: center;">
                                 <i class="fas fa-book-reader fs-5"></i>
                             </div>
                             <div class="lh-sm overflow-hidden">
-                                <small class="d-block text-dark-50" style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px;">Standar Operasional Prosedur Prosedur</small>
+                                <small class="d-block text-dark-50" style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px;">Standar Operasional Prosedur</small>
                                 <span class="fw-bold small text-truncate d-block">${data.sop || 'Dokumen SOP'}</span>
                             </div>
                         </div>
@@ -725,13 +725,14 @@ if (end2 > start2) {
     </div>`;
 }
     
-// --- CARD BESAR 3: Eselon V (Grid Simetris - Baris 2 Rata Tengah) ---
+// --- CARD BESAR 3: Eselon V (Grid Disamakan dengan Eselon IVA) ---
 const start3 = 6;
 if (list.length > start3) {
     html += `
     <div class="col-12 mb-4" data-aos="fade-up" data-aos-delay="200">
         <h5 class="fw-bold text-primary mb-4 text-center">Eselon V</h5>
-        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-5 g-3 justify-content-center">`;
+        
+        <div class="row row-cols-2 row-cols-md-3 row-cols-lg-5 g-3 justify-content-center">`;
     
     for (let i = start3; i < list.length; i++) {
         const p = list[i];
@@ -741,17 +742,16 @@ if (list.length > start3) {
                     <div class="ratio ratio-1x1 bg-light">
                         <img src="${fixGoogleDriveImage(p.foto)}" 
                              class="card-img-top" 
-                             style="object-fit: contain; padding: 10px;" 
+                             style="object-fit: contain; padding: 5px;" 
                              alt="${p.nama}">
                     </div>
-                    <div class="card-body text-center p-3">
-                        <h6 class="fw-bold text-primary mb-1 text-truncate" title="${p.nama}">${p.nama}</h6>
-                        <small class="text-muted d-block text-uppercase" style="font-size: 0.7rem; font-weight: 600;">${p.jabatan}</small>
+                    <div class="card-body text-center p-2 p-md-3">
+                        <h6 class="fw-bold text-primary mb-1 text-truncate" style="font-size: 0.9rem;" title="${p.nama}">${p.nama}</h6>
+                        <small class="text-muted d-block text-uppercase" style="font-size: 0.65rem; line-height: 1.2;">${p.jabatan}</small>
                     </div>
                 </div>
             </div>`;
     }
-    
     html += `
         </div>
     </div>`;
