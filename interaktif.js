@@ -179,34 +179,54 @@ if (type === 'kunjungan') {
     </div>`;
 
     // KARTU 2: SYARAT
-    contentHtml += `
-    <div class="col-md-6 col-xl-3" data-aos="fade-up" data-aos-delay="100">
-        <div class="card h-100 border-0 shadow-sm rounded-3 overflow-hidden bg-white">
-            <div class="card-body p-4 position-relative">
-                <div class="position-absolute top-0 start-0 bottom-0 bg-success" style="width: 6px;"></div>
-                <div class="d-flex align-items-center mb-3 pb-2 border-bottom border-light">
-                    <i class="fas fa-id-card fa-lg text-success me-2"></i>
-                    <h5 class="fw-bold text-dark m-0">SYARAT</h5>
-                </div>
-                <div>${formatToList(data.syarat, 'text-success')}</div>
+contentHtml += `
+<div class="col-md-6 col-xl-3" data-aos="fade-up" data-aos-delay="100">
+    <div class="card h-100 border-0 shadow-sm rounded-3 overflow-hidden bg-white">
+        <div class="card-body p-4 position-relative">
+            <div class="position-absolute top-0 start-0 bottom-0 bg-success" style="width: 6px;"></div>
+            <div class="d-flex align-items-center mb-3 pb-2 border-bottom border-light">
+                <i class="fas fa-id-card fa-lg text-success me-2"></i>
+                <h5 class="fw-bold text-dark m-0">SYARAT</h5>
+            </div>
+            <div class="list-unstyled">
+                ${data.syarat.split(/\r?\n/).filter(p => p.trim() !== "").map((p, i) => `
+                    <div class="d-flex align-items-start mb-2">
+                        <div class="me-2 d-flex align-items-center justify-content-center shadow-sm" 
+                             style="min-width: 24px; height: 24px; background: linear-gradient(135deg, #198754, #20c997); color: white; border-radius: 6px; font-weight: bold; font-size: 0.75rem; flex-shrink: 0; margin-top: 3px;">
+                            ${i + 1}
+                        </div>
+                        <div style="text-align: justify; font-size: 0.95rem; line-height: 1.4;">${p.trim()}</div>
+                    </div>
+                `).join('')}
             </div>
         </div>
-    </div>`;
+    </div>
+</div>`;
 
-    // KARTU 3: HIMBAUAN
-    contentHtml += `
-    <div class="col-md-6 col-xl-3" data-aos="fade-up" data-aos-delay="200">
-        <div class="card h-100 border-0 shadow-sm rounded-3 overflow-hidden bg-white">
-            <div class="card-body p-4 position-relative">
-                <div class="position-absolute top-0 start-0 bottom-0 bg-danger" style="width: 6px;"></div>
-                <div class="d-flex align-items-center mb-3 pb-2 border-bottom border-light">
-                    <i class="fas fa-bullhorn fa-lg text-danger me-2"></i>
-                    <h5 class="fw-bold text-dark m-0">HIMBAUAN</h5>
-                </div>
-                <div>${formatToList(data.himbauan, 'text-danger')}</div>
+// KARTU 3: HIMBAUAN
+contentHtml += `
+<div class="col-md-6 col-xl-3" data-aos="fade-up" data-aos-delay="200">
+    <div class="card h-100 border-0 shadow-sm rounded-3 overflow-hidden bg-white">
+        <div class="card-body p-4 position-relative">
+            <div class="position-absolute top-0 start-0 bottom-0 bg-danger" style="width: 6px;"></div>
+            <div class="d-flex align-items-center mb-3 pb-2 border-bottom border-light">
+                <i class="fas fa-bullhorn fa-lg text-danger me-2"></i>
+                <h5 class="fw-bold text-dark m-0">HIMBAUAN</h5>
+            </div>
+            <div class="list-unstyled">
+                ${data.himbauan.split(/\r?\n/).filter(p => p.trim() !== "").map((p, i) => `
+                    <div class="d-flex align-items-start mb-2">
+                        <div class="me-2 d-flex align-items-center justify-content-center shadow-sm" 
+                             style="min-width: 24px; height: 24px; background: linear-gradient(135deg, #dc3545, #fd7e14); color: white; border-radius: 6px; font-weight: bold; font-size: 0.75rem; flex-shrink: 0; margin-top: 3px;">
+                            ${i + 1}
+                        </div>
+                        <div style="text-align: justify; font-size: 0.95rem; line-height: 1.4;">${p.trim()}</div>
+                    </div>
+                `).join('')}
             </div>
         </div>
-    </div>`;
+    </div>
+</div>`;
 
     // KARTU 4: CATATAN
     contentHtml += `
@@ -224,21 +244,32 @@ if (type === 'kunjungan') {
     </div>`;
 
     // KARTU 5: SOP (BARU - DITAMBAHKAN DI ROW BARU)
-    contentHtml += `
-    </div> <!-- Tutup row pertama -->
-    <div class="row justify-content-center mt-4"> <!-- Row baru untuk SOP -->
-        <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="400">
-            <a href="javascript:void(0);" onclick="openDocPreview('Standar Operasional Prosedur', '${data.url_sop || ''}')" class="btn btn-warning text-dark text-start py-2 hover-scale border-0 shadow-sm">
-                        <div class="d-flex align-items-center">
-                            <div class="bg-white bg-opacity-25 rounded-circle p-2 me-3" style="width: 45px; height: 45px; display: flex; align-items: center; justify-content: center;">
-                                <i class="fas fa-book-reader fs-5"></i>
-                            </div>
-                            <div class="lh-sm overflow-hidden">
-                                <small class="d-block text-dark-50" style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px;">Standar Operasional Prosedur</small>
-                                <span class="fw-bold small text-truncate d-block">${data.sop || 'Dokumen SOP'}</span>
-                            </div>
-                        </div>
-                    </a>
+contentHtml += `
+    </div> <div class="row justify-content-center mt-4"> <div class="col-11 col-sm-8 col-md-6 col-lg-4 text-center" data-aos="fade-up" data-aos-delay="400">
+            
+            <a href="javascript:void(0);" 
+               onclick="openDocPreview('Standar Operasional Prosedur', '${data.url_sop || ''}')" 
+               class="btn btn-warning text-dark text-start py-2 hover-scale border-0 shadow-sm d-inline-block w-100" 
+               style="border-radius: 15px; max-width: 400px;">
+                
+                <div class="d-flex align-items-center">
+                    <div class="bg-white bg-opacity-50 rounded-circle p-2 me-3 flex-shrink-0" 
+                         style="width: 45px; height: 45px; display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-book-reader fs-5"></i>
+                    </div>
+                    
+                    <div class="lh-sm overflow-hidden">
+                        <small class="d-block opacity-75" style="font-size: 0.7rem; letter-spacing: 1px;">DOKUMEN</small>
+                        <span class="fw-bold text-truncate d-block" style="font-size: 0.9rem;">
+                            ${data.sop || 'Standar Operasional Prosedur'}
+                        </span>
+                    </div>
+                    
+                    <i class="fas fa-chevron-right ms-auto opacity-50 small"></i>
+                </div>
+                
+            </a>
+            
         </div>
     </div>`;
 
@@ -714,7 +745,7 @@ if (end2 > start2) {
                              alt="${p.nama}">
                     </div>
                     <div class="card-body text-center p-2 p-md-3">
-                        <h6 class="fw-bold text-primary mb-1 text-truncate" style="font-size: 0.9rem;">${p.nama}</h6>
+                        <h6 class="fw-bold text-primary mb-1 text-truncate" style="font-size: 0.83rem;">${p.nama}</h6>
                         <small class="text-muted d-block text-uppercase" style="font-size: 0.65rem; line-height: 1.2;">${p.jabatan}</small>
                     </div>
                 </div>
@@ -746,7 +777,7 @@ if (list.length > start3) {
                              alt="${p.nama}">
                     </div>
                     <div class="card-body text-center p-2 p-md-3">
-                        <h6 class="fw-bold text-primary mb-1 text-truncate" style="font-size: 0.9rem;" title="${p.nama}">${p.nama}</h6>
+                        <h6 class="fw-bold text-primary mb-1 text-truncate" style="font-size: 0.83rem;" title="${p.nama}">${p.nama}</h6>
                         <small class="text-muted d-block text-uppercase" style="font-size: 0.65rem; line-height: 1.2;">${p.jabatan}</small>
                     </div>
                 </div>
@@ -777,52 +808,85 @@ function renderVisiMisi(list) {
     let mottoList = list.filter(item => item.kategori.toLowerCase().includes('motto'));
     
     // 1. BAGIAN VISI
-    if (visiList.length > 0) {
-        html += '<div class="col-md-12 mb-4 text-center"><h4 class="fw-bold text-primary mb-3"><i class="fas fa-eye me-2"></i>VISI</h4>';
-        visiList.forEach(v => { html += `<p class="lead fst-italic">"${v.konten}"</p>`; });
-        html += '</div>';
-    }
+if (visiList.length > 0) {
+    html += '<div class="col-md-12 mb-4 text-center"><h4 class="fw-bold text-primary mb-3"><i class="fas fa-eye me-2"></i>VISI</h4>';
+    visiList.forEach(v => { 
+        html += `<p class="lead fst-italic">"${v.konten}"</p>`; 
+    });
+    html += '</div>';
+}
 
-    // 2. BAGIAN MISI
-    if (misiList.length > 0) {
-        html += '<div class="col-12"><hr class="my-4"></div><div class="col-md-12"><h4 class="fw-bold text-primary mb-3 text-center"><i class="fas fa-bullseye me-2"></i>MISI</h4><ul class="list-group list-group-flush">';
-        misiList.forEach(m => { 
-            let points = m.konten.split(/\r?\n/); 
-            points.forEach(p => { 
-                if(p.trim() !== "") html += `<li class="list-group-item bg-transparent border-0 ps-0"><i class="fas fa-check-circle text-warning me-3"></i>${p}</li>`; 
-            }); 
-        });
-        html += '</ul></div>';
-    }
+// 2. BAGIAN MISI
+if (misiList.length > 0) {
+    html += '<div class="col-12"><hr class="my-4"></div><div class="col-md-12"><h4 class="fw-bold text-primary mb-4 text-center"><i class="fas fa-bullseye me-2"></i>MISI KAMI</h4><ul class="list-group list-group-flush">';
+    
+    let counter = 1; 
+    
+    misiList.forEach(m => { 
+        let points = m.konten.split(/\r?\n/); 
+        points.forEach(p => { 
+            if(p.trim() !== "") {
+                html += `
+                <li class="list-group-item bg-transparent border-0 ps-0 fs-5 d-flex align-items-start mb-1 py-1">
+                    <div class="me-3 d-flex align-items-center justify-content-center shadow-sm" 
+                         style="min-width: 38px; height: 38px; background: linear-gradient(135deg, #ffca28, #f57c00); color: #fff; border-radius: 12px; font-weight: 800; font-size: 1.1rem; flex-shrink: 0; margin-top: 2px; border: 2px solid #fff;">
+                        ${counter}
+                    </div>
+                    <div style="text-align: justify; line-height: 1.6; color: #333;">
+                        ${p}
+                    </div>
+                </li>`;
+                counter++; 
+            }
+        }); 
+    });
+    html += '</ul></div>';
+}
 
-    // 3. BAGIAN TUJUAN (BARU)
-    if (tujuanList.length > 0) {
-        html += '<div class="col-12"><hr class="my-4"></div><div class="col-md-12"><h4 class="fw-bold text-primary mb-3 text-center"><i class="fas fa-flag-checkered me-2"></i>TUJUAN</h4><ul class="list-group list-group-flush">';
-        tujuanList.forEach(t => { 
-            let points = t.konten.split(/\r?\n/); 
-            points.forEach(p => { 
-                if(p.trim() !== "") html += `<li class="list-group-item bg-transparent border-0 ps-0"><i class="fas fa-angle-right text-primary me-3 fw-bold"></i>${p}</li>`; 
-            }); 
-        });
-        html += '</ul></div>';
-    }
+// 3. BAGIAN TUJUAN (UKURAN SAMA DENGAN MISI)
+if (tujuanList.length > 0) {
+    // Mengurangi margin horizontal rule (my-2) dan margin judul (mb-2)
+    html += '<div class="col-12"><hr class="my-2"></div><div class="col-md-12"><h4 class="fw-bold text-primary mb-2 text-center"><i class="fas fa-flag-checkered me-2"></i>TUJUAN</h4><ul class="list-group list-group-flush">';
+    
+    let counterTujuan = 1; 
+    
+    tujuanList.forEach(t => { 
+        let points = t.konten.split(/\r?\n/); 
+        points.forEach(p => { 
+            if(p.trim() !== "") {
+                // Mengubah mb-3 menjadi mb-1 agar jarak antar poin lebih rapat
+                html += `
+                <li class="list-group-item bg-transparent border-0 ps-0 fs-5 d-flex align-items-start mb-1 py-1">
+                    <div class="me-3 d-flex align-items-center justify-content-center shadow-sm" 
+                         style="min-width: 32px; height: 32px; background: linear-gradient(135deg, #ffca28, #f57c00); color: #fff; border-radius: 8px; font-weight: 800; font-size: 1rem; flex-shrink: 0; margin-top: 4px; border: 1px solid #fff;">
+                        ${counterTujuan}
+                    </div>
+                    <div style="text-align: justify; line-height: 1.4; color: #333;">
+                        ${p}
+                    </div>
+                </li>`;
+                counterTujuan++; 
+            }
+        }); 
+    });
+    html += '</ul></div>';
+}
 
-    // 4. BAGIAN MOTTO (BARU)
-    if (mottoList.length > 0) {
-        html += '<div class="col-12"><hr class="my-4"></div><div class="col-md-12 text-center"><h4 class="fw-bold text-primary mb-4"><i class="fas fa-star me-2"></i>MOTTO</h4>';
-        mottoList.forEach(mt => { 
-            // Tampilan Motto dibuat lebih menonjol dengan background
-            html += `
-            <div class="d-inline-block position-relative p-4 rounded-4 shadow-sm" style="background: linear-gradient(135deg, #fff 0%, #f8f9fa 100%); border: 1px solid #eee;">
-                <i class="fas fa-quote-left text-warning position-absolute top-0 start-0 m-3 fs-4 opacity-50"></i>
-                <h3 class="fw-bold text-dark m-0 fst-italic px-4 py-2" style="font-family: 'Poppins', sans-serif;">
-                    "${mt.konten}"
-                </h3>
-                <i class="fas fa-quote-right text-warning position-absolute bottom-0 end-0 m-3 fs-4 opacity-50"></i>
-            </div>`; 
-        });
-        html += '</div>';
-    }
+// 4. BAGIAN MOTTO
+if (mottoList.length > 0) {
+    html += '<div class="col-12"><hr class="my-4"></div><div class="col-md-12 text-center"><h4 class="fw-bold text-primary mb-4"><i class="fas fa-star me-2"></i>MOTTO</h4>';
+    mottoList.forEach(mt => { 
+        html += `
+        <div class="d-inline-block position-relative p-4 rounded-4 shadow-sm" style="background: linear-gradient(135deg, #fff 0%, #f8f9fa 100%); border: 1px solid #eee;">
+            <i class="fas fa-quote-left text-warning position-absolute top-0 start-0 m-3 fs-4 opacity-50"></i>
+            <h3 class="fw-bold text-dark m-0 fst-italic px-4 py-2">
+                "${mt.konten}"
+            </h3>
+            <i class="fas fa-quote-right text-warning position-absolute bottom-0 end-0 m-3 fs-4 opacity-50"></i>
+        </div>`; 
+    });
+    html += '</div>';
+}
 
     html += '</div>';
     container.innerHTML = html;
@@ -1164,12 +1228,24 @@ function renderPKBM(list) {
                 <p class="text-secondary lh-lg mb-4" style="text-align: justify;">
                     ${data.deskripsi ? data.deskripsi.replace(/\n/g, '<br>') : 'Deskripsi belum tersedia.'}
                 </p>
-                <div class="bg-light p-3 rounded-3 border-start border-4 border-warning">
-                    <h6 class="fw-bold text-dark mb-2">Program Kegiatan:</h6>
-                    <ul class="mb-0 ps-3 text-secondary">
-                        ${data.program_kegiatan ? data.program_kegiatan.split('\n').map(k => `<li>${k}</li>`).join('') : '<li>Belum ada data</li>'}
-                    </ul>
+              <div class="bg-light p-3 rounded-3 border-start border-4 border-warning shadow-sm">
+    <h6 class="fw-bold text-dark mb-3">
+        <i class="fas fa-calendar-alt me-2 text-warning"></i>Program Kegiatan:
+    </h6>
+    <div class="list-unstyled">
+        ${data.program_kegiatan ? data.program_kegiatan.split(/\r?\n/).filter(k => k.trim() !== "").map((k, i) => `
+            <div class="d-flex align-items-start mb-2">
+                <div class="me-2 d-flex align-items-center justify-content-center shadow-sm" 
+                     style="min-width: 24px; height: 24px; background: linear-gradient(135deg, #ffca28, #f57c00); color: white; border-radius: 6px; font-weight: bold; font-size: 0.75rem; flex-shrink: 0; margin-top: 2px;">
+                    ${i + 1}
                 </div>
+                <div class="text-secondary" style="text-align: justify; font-size: 0.9rem; line-height: 1.4;">
+                    ${k.trim()}
+                </div>
+            </div>
+        `).join('') : '<div class="text-muted small ps-2">Belum ada data</div>'}
+    </div>
+</div>
             </div>
         </div>
         
@@ -1186,7 +1262,7 @@ function renderPKBM(list) {
                     <h5 class="fw-bold mb-1 ls-1">PKBM TUNAS MEKAR AMAN</h5>
                     <h6 class="fw-bold mb-2 ls-1 opacity-75">LPKA KLAS I KUTOARJO</h6>
                     <span class="badge bg-warning text-dark fw-bold mb-3 px-3 py-2 rounded-pill">
-                        <i class="fas fa-star me-1"></i> Terakreditasi B
+                        <i class="fas fa-star me-1"></i> ${data.akreditasi || 'Terakreditasi A'}
                     </span>
                     <div style="width: 60px; height: 3px; background: #fff; margin: 0 auto;"></div>
                 </div>
@@ -1220,7 +1296,6 @@ function renderPKBM(list) {
                                 <i class="fas fa-book-reader fs-5"></i>
                             </div>
                             <div class="lh-sm overflow-hidden">
-                                <small class="d-block text-dark-50" style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px;">Standar Operasional Prosedur</small>
                                 <span class="fw-bold small text-truncate d-block">${data.sop || 'Dokumen SOP'}</span>
                             </div>
                         </div>
@@ -1537,15 +1612,15 @@ function renderKlinik(list) {
     <div class="row g-4 mb-5">
         <div class="col-lg-8" data-aos="fade-right">
             <div class="card h-100 border-0 shadow-sm rounded-4 p-4">
-                <h4 class="fw-bold text-danger mb-3"><i class="fas fa-heartbeat me-2"></i>Tentang Klinik</h4>
+                <h4 class="fw-bold text-success mb-3"><i class="fas fa-stethoscope me-2"></i>Tentang Klinik</h4>
                 <p class="text-secondary lh-lg mb-4" style="text-align: justify;">
                     ${mainData.deskripsi ? mainData.deskripsi.replace(/\n/g, '<br>') : 'Deskripsi belum tersedia.'}
                 </p>
                 <div class="d-flex flex-wrap gap-3">
-                     <div class="bg-light px-3 py-2 rounded text-danger fw-bold">
+                     <div class="bg-light px-3 py-2 rounded text-warning fw-bold">
                         <i class="fas fa-clock me-2"></i> Layanan 24 Jam
                      </div>
-                     <div class="bg-light px-3 py-2 rounded text-success fw-bold">
+                     <div class="bg-light px-3 py-2 rounded text-warning fw-bold">
                         <i class="fas fa-user-md me-2"></i> Tenaga Profesional
                      </div>
                 </div>
@@ -1553,7 +1628,7 @@ function renderKlinik(list) {
         </div>
         
         <div class="col-lg-4" data-aos="fade-left">
-            <div class="card h-100 border-0 shadow-sm rounded-4 p-4 bg-danger text-white position-relative overflow-hidden d-flex flex-column justify-content-center">
+            <div class="card h-100 border-0 shadow-sm rounded-4 p-4 bg-success text-white position-relative overflow-hidden d-flex flex-column justify-content-center">
                 
                 ${logoUrl ? `
                 <div class="text-center mb-3 position-relative" style="z-index: 2;">
@@ -1567,7 +1642,7 @@ function renderKlinik(list) {
                     <h6 class="fw-bold mb-2 ls-1 opacity-75">LPKA KLAS I KUTOARJO</h6>
                     
                     <span class="badge bg-warning text-dark fw-bold mb-3 px-3 py-2 rounded-pill">
-                        <i class="fas fa-star me-1"></i> ${mainData.akreditasi || 'Terakreditasi A'}
+                        <i class="fas fa-star me-1"></i> ${mainData.akreditasi || 'Terakreditasi B'}
                     </span>
                     <div style="width: 60px; height: 3px; background: #fff; margin: 0 auto;"></div>
                 </div>
@@ -1603,7 +1678,6 @@ function renderKlinik(list) {
                                 <i class="fas fa-book-reader fs-5"></i>
                             </div>
                             <div class="lh-sm overflow-hidden">
-                                <small class="d-block text-dark-50" style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px;">Standar Operasional Prosedur</small>
                                 <span class="fw-bold small text-truncate d-block">${mainData.sop || 'Dokumen SOP'}</span>
                             </div>
                         </div>
@@ -1616,7 +1690,7 @@ function renderKlinik(list) {
     // --- 4. LAYOUT: GALERI ---
     const galeriData = (typeof globalData !== 'undefined' && globalData.galeri_klinik) ? globalData.galeri_klinik : [];
     if (typeof renderGallerySlider === 'function') {
-        html += renderGallerySlider(galeriData, "Fasilitas & Kegiatan Klinik", "klinikGallery", "danger");
+        html += renderGallerySlider(galeriData, "Fasilitas & Kegiatan Klinik", "klinikGallery", "success");
     }
 
     // --- 5. LAYOUT: STATISTIK ---
