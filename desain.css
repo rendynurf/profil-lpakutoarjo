@@ -12,69 +12,92 @@ body { font-family: 'Inter', sans-serif; background-color: var(--bg-light); colo
 h1, h2, h3, h4, h5, h6, .navbar-brand { font-family: 'Poppins', sans-serif; }
 a { text-decoration: none; }
 
-/* --- LOADING SCREEN --- */
+/* --- LOADING SCREEN (FIXED MOBILE) --- */
 #loader-wrapper {
     position: fixed;
-    top: 0;
-    left: 0;
+    inset: 0; /* Mengunci ke 4 sisi layar (Top, Bottom, Left, Right) */
     width: 100%;
-    /* Gunakan 100vh sebagai fallback, dan 100dvh untuk mobile modern */
-    height: 100vh;
-    height: 100dvh; 
+    height: 100vh; /* Fallback untuk browser lama */
+    height: 100dvh; /* KUNCI UTAMA: Menyesuaikan tinggi layar HP asli (termasuk address bar) */
     background: #ffffff;
     z-index: 9999;
     display: flex;
-    flex-direction: column;
     justify-content: center;
     align-items: center;
-    transition: opacity 0.5s ease-out, visibility 0.5s ease-out;
-    /* Pastikan margin/padding 0 agar tidak ada celah */
     margin: 0;
     padding: 0;
+    overflow: hidden; /* Mencegah scroll saat loading */
 }
-.loader-content { position: relative; text-align: center; }
-.loader-img { width: 120px; height: auto; margin-bottom: 20px; animation: bounce-garcy 2s infinite ease-in-out; }
+
+.loader-content {
+    position: relative;
+    text-align: center;
+    width: 100%; /* Memastikan konten terpusat */
+    max-width: 300px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Container khusus untuk Logo & Spinner agar satu titik pusat */
+.loader-icon-box {
+    position: relative;
+    width: 120px; /* Lebar area logo */
+    height: 120px; /* Tinggi area logo */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 25px; /* Jarak ke teks */
+}
+
+/* Logo Garcy */
+.loader-img {
+    width: 100px; /* Ukuran logo di dalam box */
+    height: auto;
+    animation: bounce-garcy 2s infinite ease-in-out;
+    position: relative;
+    z-index: 2; /* Logo di atas spinner */
+}
+
+/* Lingkaran Berputar */
 .spinner-ring {
     position: absolute;
     top: 50%;
     left: 50%;
-    width: 160px;
-    height: 160px;
-    /* Ubah -65% menjadi -50% agar benar-benar presisi di tengah vertikal */
-    transform: translate(-50%, -50%); 
+    width: 150px; /* Ukuran spinner sedikit lebih besar dari box */
+    height: 150px;
+    transform: translate(-50%, -50%); /* KUNCI: Titik tengah absolut presisi */
     border: 5px solid rgba(0, 51, 102, 0.1);
     border-top: 5px solid var(--accent-gold);
     border-radius: 50%;
-    animation: spin 1.5s linear infinite;
-    z-index: -1;
+    animation: spin 1s linear infinite;
+    z-index: 1; /* Spinner di belakang logo */
 }
-.loading-text { font-family: 'Poppins', sans-serif; font-weight: 600; color: var(--primary-blue); font-size: 1.2rem; letter-spacing: 1px; margin-top: 10px; animation: pulse-text 1.5s infinite; }
+
+/* Teks Memuat */
+.loading-text {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 700;
+    color: var(--primary-blue);
+    font-size: 1rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    animation: pulse-text 1.5s infinite;
+}
+
+/* Keyframes (Tetap sama) */
+@keyframes spin { 0% { transform: translate(-50%, -50%) rotate(0deg); } 100% { transform: translate(-50%, -50%) rotate(360deg); } }
+@keyframes bounce-garcy { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+@keyframes pulse-text { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
+
 .loader-hidden { opacity: 0; visibility: hidden; pointer-events: none; }
 
-html {
-    height: 100%; /* HTML tetap 100% tidak masalah */
-}
-
-body {
-    min-height: 100vh; /* Gunakan min-height agar bisa memanjang ke bawah */
-    height: auto;      /* Biarkan tinggi menyesuaikan konten */
-    margin: 0;
-    padding: 0;
-    overflow-x: hidden; /* Mencegah geser kanan-kiri */
-    position: relative; /* Penting untuk stacking context */
-}
-
-/* Tambahan: Pastikan loader tidak mengganggu scroll setelah hilang */
+/* Mencegah halaman bisa discroll saat loading aktif */
 body.loading {
     overflow: hidden;
-    /* Gunakan min-height dan dvh */
-    height: 100dvh; 
-    position: fixed; /* Kunci posisi agar tidak bisa discroll paksa */
-    width: 100%;
+    height: 100dvh;
 }
-@keyframes spin { 0% { transform: translate(-50%, -65%) rotate(0deg); } 100% { transform: translate(-50%, -65%) rotate(360deg); } }
-@keyframes bounce-garcy { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
-@keyframes pulse-text { 0%, 100% { opacity: 0.6; } 50% { opacity: 1; } }
 
 /* --- TOP BAR & HEADER --- */
 .top-bar { background: linear-gradient(90deg, var(--primary-blue) 0%, var(--secondary-blue) 100%); color: white; padding: 8px 0; font-size: 0.85rem; }
