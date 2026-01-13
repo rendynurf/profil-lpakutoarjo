@@ -27,15 +27,6 @@ a { text-decoration: none; }
     animation: float 3s ease-in-out infinite;
 }
 
-html, body {
-    height: 100%;
-}
-
-body.loading {
-    overflow: hidden;
-}
-
-
 /* Animasi Mengambang (Floating Effect) */
 @keyframes float {
     0% {
@@ -76,13 +67,6 @@ body.loading {
 @keyframes spin { 0% { transform: translate(-50%, -65%) rotate(0deg); } 100% { transform: translate(-50%, -65%) rotate(360deg); } }
 @keyframes bounce-garcy { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
 @keyframes pulse-text { 0%, 100% { opacity: 0.6; } 50% { opacity: 1; } }
-
-/* Responsif untuk Mobile */
-@media (max-width: 768px) {
-    .loader-img { width: 80px; margin-bottom: 15px; }
-    .spinner-ring { width: 120px; height: 120px; }
-    .loading-text { font-size: 1rem; margin-top: 8px; }
-}
 
 /* --- TOP BAR & HEADER --- */
 .top-bar { background: linear-gradient(90deg, var(--primary-blue) 0%, var(--secondary-blue) 100%); color: white; padding: 8px 0; font-size: 0.85rem; }
