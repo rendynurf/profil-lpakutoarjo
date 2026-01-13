@@ -34,7 +34,10 @@ function hideLoader() {
     const loader = document.getElementById('loader-wrapper');
     if(loader) {
         loader.classList.add('loader-hidden');
-        loader.addEventListener('transitionend', function() { loader.style.display = 'none'; });
+        loader.addEventListener('transitionend', function() { 
+            loader.style.display = 'none'; 
+            document.body.classList.remove('loading'); // Hapus class loading setelah loader hilang
+        });
     }
 }
 
@@ -42,6 +45,7 @@ function hideLoader() {
 // 1. FUNGSI UTAMA LOAD DATA (FETCH API)
 // ==========================================
 async function loadData() {
+        document.body.classList.add('loading'); 
     try {
         const cachedData = sessionStorage.getItem(CACHE_KEY);
         
