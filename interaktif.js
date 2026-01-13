@@ -415,80 +415,92 @@ function openDocPreview(title, url) {
 // ==========================================
 // 5. RENDER FUNCTIONS UMUM (BERITA, PEJABAT, DLL)
 // ==========================================
+// ==========================================
+// 5. RENDER FUNCTIONS INFO PUBLIK (MODEL ACCORDION CARD)
+// ==========================================
 function renderInfoPublik(list) {
     const container = document.getElementById('infopublik-container');
-    if (!container) return; 
-    
-    // Validasi data kosong
+    if (!container) return;
+
+    // 1. Validasi data kosong
     if (!list || !Array.isArray(list) || list.length === 0) {
-        container.innerHTML = `<div class="col-12 text-center py-5"><h5 class="text-muted">Data dokumen belum tersedia.</h5></div>`; 
-        return; 
-    }
-    
-    // Filter Kategori (jika ada di URL)
-    const urlParams = new URLSearchParams(window.location.search);
-    const activeCategory = urlParams.get('kategori');
-    let displayList = list;
-
-    if (activeCategory) {
-        displayList = list.filter(item => {
-            const kat = item.kategori || item.Kategori || "";
-            return kat.toString().toLowerCase() === activeCategory.toLowerCase();
-        });
-        const pageTitle = document.querySelector('h3.display-6');
-        if(pageTitle) pageTitle.innerText = activeCategory;
+        container.innerHTML = `<div class="col-12 text-center py-5"><h5 class="text-muted">Data dokumen belum tersedia.</h5></div>`;
+        return;
     }
 
-    // Jika hasil filter kosong
-    if (displayList.length === 0) { 
-        container.innerHTML = `<div class="col-12 text-center py-5"><h5 class="text-muted">Tidak ada dokumen untuk kategori ini.</h5></div>`; 
-        return; 
-    }
+    // 2. Grouping Data Berdasarkan Kategori
+    const groupedData = list.reduce((acc, item) => {
+        const cat = item.kategori || item.Kategori || "Lainnya";
+        if (!acc[cat]) acc[cat] = [];
+        acc[cat].push(item);
+        return acc;
+    }, {});
 
-    let html = '';
-    displayList.forEach((item) => {
-        // 1. AMBIL JUDUL (Cek berbagai variasi)
-        let title = item.namaDokumen || item.namadokumen || item.judul || item.Judul || "Dokumen";
-        
-        // 2. AMBIL LINK (Cek berbagai variasi)
-        let link = item.linkDokumenFull || item.linkdokumenfull || item.link || item.url || "#";
-        
-        // 3. AMBIL DESKRIPSI (MODIFIKASI: AMBIL 150 KARAKTER)
-        let rawDesc = item.deskripsiSingkat || item.deskripsisingkat || item.deskripsi || "";
-        let strDesc = rawDesc.toString();
-        let desc = strDesc.length > 150 ? strDesc.substring(0, 150) + "..." : strDesc;
-        
-        // 4. AMBIL GAMBAR (PERBAIKAN UTAMA DISINI)
-        // Menambahkan variasi: gambar, cover, sampul, imageurl (huruf kecil), dll.
-        let rawImg = item.imageUrl || item.imageurl || item.gambar || item.Gambar || item.cover || item.sampul || item.urlGambar || "";
-        let img = fixGoogleDriveImage(rawImg);
-        
-        // 5. AMBIL KATEGORI
-        let cat = item.kategori || item.Kategori || "";
-        let kategoriBadge = cat ? `<span class="badge bg-warning text-dark mb-2">${cat}</span>` : '';
-        
-        // Tentukan tampilan Thumbnail (Gambar atau Ikon PDF)
-        let thumb = img ? 
-            `<img src="${img}" alt="${title}" onerror="this.parentElement.innerHTML='<div class=\\'doc-icon\\'><i class=\\'fas fa-file-pdf\\'></i></div>'">` : 
-            `<div class="doc-icon"><i class="fas fa-file-pdf"></i></div>`;
-        
+    // 3. Generate HTML Accordion
+    let html = '<div class="col-12"><div class="accordion" id="accInfoPublik">';
+    let index = 0;
+
+    for (const [category, items] of Object.entries(groupedData)) {
+        const isExpanded = index === 0 ? 'true' : 'false';
+        const showClass = index === 0 ? 'show' : '';
+        const btnCollapsed = index !== 0 ? 'collapsed' : '';
+
         html += `
-        <div class="col-md-6 col-lg-3" data-aos="fade-up">
-            <div class="card card-doc" onclick="openDocPreview('${title.replace(/'/g, "\\'")}', '${link}')">
-                <div class="doc-thumb">
-                    ${thumb}
-                    <div class="doc-overlay"><i class="fas fa-eye text-white fa-2x"></i></div>
+        <div class="accordion-item border-0 shadow-sm mb-4 rounded overflow-hidden">
+            <h2 class="accordion-header" id="heading${index}">
+                <button class="accordion-button ${btnCollapsed} fw-bold text-primary bg-light" type="button" data-bs-toggle="collapse" data-bs-target="#collapse${index}" aria-expanded="${isExpanded}" aria-controls="collapse${index}">
+                   <i class="fas fa-folder-open me-2"></i> ${category.toUpperCase()} 
+                   <span class="badge bg-primary ms-2 rounded-pill">${items.length} Dokumen</span>
+                </button>
+            </h2>
+            <div id="collapse${index}" class="accordion-collapse collapse ${showClass}" aria-labelledby="heading${index}" data-bs-parent="#accInfoPublik">
+                <div class="accordion-body bg-white pt-4">
+                    <div class="row">`; // Mulai Row untuk Card
+
+        // 4. Loop item untuk dijadikan CARD di dalam Accordion
+        items.forEach((item) => {
+            let title = item.namaDokumen || item.namadokumen || item.judul || item.Judul || "Dokumen";
+            let link = item.linkDokumenFull || item.linkdokumenfull || item.link || item.url || "#";
+            
+            let rawDesc = item.deskripsiSingkat || item.deskripsisingkat || item.deskripsi || "";
+            let strDesc = rawDesc.toString();
+            let desc = strDesc.length > 120 ? strDesc.substring(0, 120) + "..." : strDesc;
+            
+            let rawImg = item.imageUrl || item.imageurl || item.gambar || item.Gambar || item.cover || item.sampul || "";
+            let img = fixGoogleDriveImage(rawImg);
+            
+            let thumb = img ? 
+                `<img src="${img}" alt="${title}" onerror="this.parentElement.innerHTML='<div class=\\'doc-icon\\'><i class=\\'fas fa-file-pdf\\'></i></div>'">` : 
+                `<div class="doc-icon"><i class="fas fa-file-pdf"></i></div>`;
+
+            html += `
+            <div class="col-md-6 col-lg-3 mb-4">
+                <div class="card card-doc h-100 border-0 shadow-sm" onclick="openDocPreview('${title.replace(/'/g, "\\'")}', '${link}')" style="cursor:pointer">
+                    <div class="doc-thumb">
+                        ${thumb}
+                        <div class="doc-overlay"><i class="fas fa-eye text-white fa-2x"></i></div>
+                    </div>
+                    <div class="card-body">
+                        <h6 class="fw-bold text-primary mb-2 text-truncate-2" title="${title}" style="font-size: 0.9rem; line-height: 1.4;">${title}</h6>
+                        <p class="small text-muted mb-0" style="font-size: 0.8rem;">${desc}</p>
+                    </div>
+                    <div class="card-footer bg-white border-0 pt-0 pb-3">
+                         <span class="badge bg-light text-primary border w-100">Lihat Dokumen <i class="fas fa-arrow-right ms-1"></i></span>
+                    </div>
                 </div>
-                <div class="card-body">
-                    ${kategoriBadge}
-                    <h6 class="fw-bold text-primary mb-2 text-truncate" title="${title}">${title}</h6>
-                    <p class="small text-muted mb-0">${desc}</p>
-                </div>
+            </div>`;
+        });
+
+        html += `   </div> </div>
             </div>
         </div>`;
-    });
+        
+        index++;
+    }
+
+    html += '</div></div>';
     container.innerHTML = html;
-}
+}   
 
 function setupInfoPublikMenu(list) {
     const dropdown = document.getElementById('infoPublikDropdown');
