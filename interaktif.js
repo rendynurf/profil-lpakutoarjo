@@ -29,15 +29,30 @@ window.onscroll = function() {
     }
 };
 
-// --- HELPER LOADING SCREEN ---
+// --- HELPER LOADING SCREEN (FIXED) ---
 function hideLoader() {
     const loader = document.getElementById('loader-wrapper');
+    
+    // Fungsi pembuka kunci layar (dipisah agar bisa dipanggil kapan saja)
+    const unlockScreen = () => {
+        document.body.classList.remove('loading'); 
+        document.body.style.overflow = 'auto'; 
+        document.body.style.overflowX = 'hidden';
+        document.body.style.height = 'auto';
+    };
+
     if(loader) {
+        // Jika ada elemen loader (seperti di Beranda), jalankan animasi
         loader.classList.add('loader-hidden');
-        loader.addEventListener('transitionend', function() { 
+        setTimeout(() => {
             loader.style.display = 'none'; 
-            document.body.classList.remove('loading'); // Hapus class loading setelah loader hilang
-        });
+            unlockScreen(); // Buka kunci setelah animasi selesai
+            window.scrollTo(0, 0);
+        }, 500); 
+    } else {
+        // PENTING: Jika elemen loader TIDAK ADA (di halaman sub),
+        // LANGSUNG buka kunci layar agar tidak macet.
+        unlockScreen();
     }
 }
 
