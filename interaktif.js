@@ -33,10 +33,17 @@ window.onscroll = function() {
 function hideLoader() {
     const loader = document.getElementById('loader-wrapper');
     if(loader) {
+        // Paksa scroll ke atas sebelum loader hilang sepenuhnya
+        window.scrollTo(0, 0);
+        
         loader.classList.add('loader-hidden');
         loader.addEventListener('transitionend', function() { 
             loader.style.display = 'none'; 
-            document.body.classList.remove('loading'); // Hapus class loading setelah loader hilang
+            document.body.classList.remove('loading'); 
+            
+            // Tambahan keamanan: Pastikan style overflow benar-benar bersih
+            document.body.style.overflow = 'auto';
+            document.body.style.overflowX = 'hidden';
         });
     }
 }
