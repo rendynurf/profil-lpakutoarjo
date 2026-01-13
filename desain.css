@@ -12,91 +12,76 @@ body { font-family: 'Inter', sans-serif; background-color: var(--bg-light); colo
 h1, h2, h3, h4, h5, h6, .navbar-brand { font-family: 'Poppins', sans-serif; }
 a { text-decoration: none; }
 
-/* --- LOADING SCREEN (FIXED MOBILE) --- */
-#loader-wrapper {
-    position: fixed;
-    inset: 0; /* Mengunci ke 4 sisi layar (Top, Bottom, Left, Right) */
-    width: 100%;
-    height: 100vh; /* Fallback untuk browser lama */
-    height: 100dvh; /* KUNCI UTAMA: Menyesuaikan tinggi layar HP asli (termasuk address bar) */
-    background: #ffffff;
-    z-index: 9999;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin: 0;
-    padding: 0;
-    overflow: hidden; /* Mencegah scroll saat loading */
-}
-
+/* --- LOADING SCREEN --- */
+/* Efek Container agar gambar terlihat melayang */
 .loader-content {
-    position: relative;
-    text-align: center;
-    width: 100%; /* Memastikan konten terpusat */
-    max-width: 300px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
+    perspective: 1000px; /* Memberikan efek kedalaman ruang */
 }
 
-/* Container khusus untuk Logo & Spinner agar satu titik pusat */
-.loader-icon-box {
-    position: relative;
-    width: 120px; /* Lebar area logo */
-    height: 120px; /* Tinggi area logo */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-bottom: 25px; /* Jarak ke teks */
-}
-
-/* Logo Garcy */
 .loader-img {
-    width: 100px; /* Ukuran logo di dalam box */
-    height: auto;
-    animation: bounce-garcy 2s infinite ease-in-out;
-    position: relative;
-    z-index: 2; /* Logo di atas spinner */
+    width: 100px; /* Sesuaikan ukuran */
+    filter: drop-shadow(0 10px 15px rgba(0, 0, 0, 0.3)); /* Bayangan mengikuti bentuk gambar */
+    transition: transform 0.3s ease;
+    
+    /* Animasi agar gambar terlihat hidup/mengambang */
+    animation: float 3s ease-in-out infinite;
 }
 
-/* Lingkaran Berputar */
-.spinner-ring {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 150px; /* Ukuran spinner sedikit lebih besar dari box */
-    height: 150px;
-    transform: translate(-50%, -50%); /* KUNCI: Titik tengah absolut presisi */
-    border: 5px solid rgba(0, 51, 102, 0.1);
-    border-top: 5px solid var(--accent-gold);
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-    z-index: 1; /* Spinner di belakang logo */
+html, body {
+    height: 100%;
 }
 
-/* Teks Memuat */
-.loading-text {
-    font-family: 'Poppins', sans-serif;
-    font-weight: 700;
-    color: var(--primary-blue);
-    font-size: 1rem;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    animation: pulse-text 1.5s infinite;
-}
-
-/* Keyframes (Tetap sama) */
-@keyframes spin { 0% { transform: translate(-50%, -50%) rotate(0deg); } 100% { transform: translate(-50%, -50%) rotate(360deg); } }
-@keyframes bounce-garcy { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
-@keyframes pulse-text { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
-
-.loader-hidden { opacity: 0; visibility: hidden; pointer-events: none; }
-
-/* Mencegah halaman bisa discroll saat loading aktif */
 body.loading {
     overflow: hidden;
-    height: 100dvh;
+}
+
+
+/* Animasi Mengambang (Floating Effect) */
+@keyframes float {
+    0% {
+        transform: translateY(0px) rotateX(0deg);
+        filter: drop-shadow(0 5px 10px rgba(0, 0, 0, 0.2));
+    }
+    50% {
+        transform: translateY(-15px) rotateX(10deg); /* Sedikit miring ke depan */
+        filter: drop-shadow(0 25px 20px rgba(0, 0, 0, 0.4)); /* Bayangan menjauh saat naik */
+    }
+    100% {
+        transform: translateY(0px) rotateX(0deg);
+        filter: drop-shadow(0 5px 10px rgba(0, 0, 0, 0.2));
+    }
+}
+
+/* Opsional: Jika ingin spinner-ring juga terlihat 3D */
+.spinner-ring {
+    border: 4px solid rgba(255, 255, 255, 0.1);
+    border-top: 4px solid #3498db; /* Warna aksen */
+    border-radius: 50%;
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.2);
+}
+#loader-wrapper {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: #ffffff; z-index: 9999; display: flex; flex-direction: column;
+    justify-content: center; align-items: center; transition: opacity 0.5s ease-out, visibility 0.5s ease-out;
+}
+.loader-content { position: relative; text-align: center; }
+.loader-img { width: 120px; height: auto; margin-bottom: 20px; animation: bounce-garcy 2s infinite ease-in-out; }
+.spinner-ring {
+    position: absolute; top: 50%; left: 50%; width: 160px; height: 160px;
+    transform: translate(-50%, -65%); border: 5px solid rgba(0, 51, 102, 0.1);
+    border-top: 5px solid var(--accent-gold); border-radius: 50%; animation: spin 1.5s linear infinite; z-index: -1;
+}
+.loading-text { font-family: 'Poppins', sans-serif; font-weight: 600; color: var(--primary-blue); font-size: 1.2rem; letter-spacing: 1px; margin-top: 10px; animation: pulse-text 1.5s infinite; }
+.loader-hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+@keyframes spin { 0% { transform: translate(-50%, -65%) rotate(0deg); } 100% { transform: translate(-50%, -65%) rotate(360deg); } }
+@keyframes bounce-garcy { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
+@keyframes pulse-text { 0%, 100% { opacity: 0.6; } 50% { opacity: 1; } }
+
+/* Responsif untuk Mobile */
+@media (max-width: 768px) {
+    .loader-img { width: 80px; margin-bottom: 15px; }
+    .spinner-ring { width: 120px; height: 120px; }
+    .loading-text { font-size: 1rem; margin-top: 8px; }
 }
 
 /* --- TOP BAR & HEADER --- */
@@ -133,13 +118,7 @@ body.loading {
 .carousel-caption p { color: #f0f0f0; font-weight: 400; font-size: 1.1rem; letter-spacing: 0.5px; max-width: 800px; margin: 0 auto 20px auto; text-shadow: 0px 2px 5px rgba(0,0,0,0.7); }
 .btn-banner { font-size: 0.9rem; padding: 10px 25px; border-radius: 50px; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); transition: transform 0.3s; }
 .btn-banner:hover { transform: translateY(-3px); }
-
-/* Responsif untuk Mobile */
-@media (max-width: 768px) {
-    .loader-img { width: 80px; margin-bottom: 15px; }
-    .spinner-ring { width: 120px; height: 120px; }
-    .loading-text { font-size: 1rem; margin-top: 8px; }
-}
+@media (max-width: 768px) { .carousel-item img { height: 350px; } .carousel-caption h2 { font-size: 1.2rem; } .carousel-caption p { font-size: 0.8rem; } }
 
 /* --- CARD BERITA --- */
 .card-news { border: none; border-radius: 12px; background: white; box-shadow: 0 5px 15px rgba(0,0,0,0.05); transition: all 0.4s; height: 100%; overflow: hidden; }
@@ -565,6 +544,35 @@ body.loading {
     overflow: hidden;
     text-overflow: ellipsis;
     letter-spacing: 0.5px; /* Sedikit jarak antar huruf agar elegan */
+}
+
+/* Styling Accordion agar terlihat modern */
+.accordion-item {
+    border-radius: 8px !important;
+    overflow: hidden;
+}
+
+.accordion-button {
+    font-size: 1.1rem;
+    box-shadow: none !important; /* Hapus outline biru saat klik */
+}
+
+.accordion-button:not(.collapsed) {
+    color: #0d6efd; /* Warna teks saat terbuka */
+    background-color: #e7f1ff; /* Warna background saat terbuka */
+}
+
+/* Styling Card Dokumen di dalam Accordion */
+.hover-shadow:hover {
+    box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important;
+}
+
+.doc-icon {
+    background-color: #f8f9fa;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 180px; /* Samakan tinggi dengan gambar */
 }
 
 /* NOTE: .creative-line DIHAPUS total dari CSS ini untuk tampilan minimalis */
