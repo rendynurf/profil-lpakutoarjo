@@ -29,30 +29,15 @@ window.onscroll = function() {
     }
 };
 
-// --- HELPER LOADING SCREEN (FIXED) ---
+// --- HELPER LOADING SCREEN ---
 function hideLoader() {
     const loader = document.getElementById('loader-wrapper');
-    
-    // Fungsi pembuka kunci layar (dipisah agar bisa dipanggil kapan saja)
-    const unlockScreen = () => {
-        document.body.classList.remove('loading'); 
-        document.body.style.overflow = 'auto'; 
-        document.body.style.overflowX = 'hidden';
-        document.body.style.height = 'auto';
-    };
-
     if(loader) {
-        // Jika ada elemen loader (seperti di Beranda), jalankan animasi
         loader.classList.add('loader-hidden');
-        setTimeout(() => {
+        loader.addEventListener('transitionend', function() { 
             loader.style.display = 'none'; 
-            unlockScreen(); // Buka kunci setelah animasi selesai
-            window.scrollTo(0, 0);
-        }, 500); 
-    } else {
-        // PENTING: Jika elemen loader TIDAK ADA (di halaman sub),
-        // LANGSUNG buka kunci layar agar tidak macet.
-        unlockScreen();
+            document.body.classList.remove('loading'); // Hapus class loading setelah loader hilang
+        });
     }
 }
 
@@ -547,56 +532,124 @@ function setupSearchListener() {
     });
 }
 
+// Variable global untuk menampung data pencarian
+let currentSearchResults = [];
+
 function performSearch(data) {
     const keyword = getQueryParam('q');
     const container = document.getElementById('search-results-container');
     const titleEl = document.getElementById('search-title');
-    const subtitleEl = document.getElementById('search-subtitle');
     
     if (!container) return;
-    if (!keyword) { 
-        container.innerHTML = '<div class="alert alert-warning text-center">Silakan masukkan kata kunci.</div>'; 
-        if(subtitleEl) subtitleEl.innerText = ""; 
-        return; 
+    if (!keyword) {
+        container.innerHTML = '<div class="alert alert-info text-center mt-5">Silakan masukkan kata kunci pencarian.</div>';
+        return;
     }
-    
-    if(titleEl) titleEl.innerText = `Hasil: "${keyword}"`;
-    if(subtitleEl) subtitleEl.innerText = `Menampilkan hasil untuk "${keyword}"`;
+
+    // Ganti judul dan pastikan teks instruksi lama hilang
+    if(titleEl) titleEl.innerText = `Hasil Pencarian: "${keyword}"`;
     
     const lowerKeyword = keyword.toLowerCase();
-    let results = [];
+    currentSearchResults = []; // Reset data
     const safeLower = (txt) => (txt || "").toString().toLowerCase();
-    
-    // Search logic (Berita, Pejabat, Dokumen)
-    if (data.berita) data.berita.forEach((item, index) => { 
-        if (safeLower(item.judul).includes(lowerKeyword) || safeLower(item.isi).includes(lowerKeyword)) 
-            results.push({ type: 'BERITA', title: item.judul, desc: item.ringkasan || '', link: `bacaselengkapnya.html?id=${index}` }); 
-    });
-    if (data.pejabat) data.pejabat.forEach(item => { 
-        if (safeLower(item.nama).includes(lowerKeyword)) 
-            results.push({ type: 'PEJABAT', title: item.nama, desc: item.jabatan || '', link: 'pejabat.html' }); 
-    });
-    const infoPublikData = data.infoPublik || data.infopublik || [];
-    infoPublikData.forEach(item => { 
-        let nama = item.namaDokumen || item.judul || ""; 
-        if (safeLower(nama).includes(lowerKeyword)) 
-            results.push({ type: 'DOKUMEN', title: nama, desc: item.kategori || '', link: item.linkDokumenFull || '#', isExternal: true }); 
+
+    // --- PROSES DATA ---
+    // 1. Berita
+    if (data.berita) data.berita.forEach((item, index) => {
+        if (safeLower(item.judul).includes(lowerKeyword)) {
+            currentSearchResults.push({ 
+                type: 'BERITA', title: item.judul, desc: item.ringkasan || item.isi, 
+                link: `bacaselengkapnya.html?id=${index}`, 
+                image: item.gambar || item.imageUrl || "" 
+            });
+        }
     });
 
-    if (results.length === 0) { 
-        container.innerHTML = `<div class="text-center py-5"><h5 class="text-muted">Tidak ditemukan hasil.</h5></div>`; 
+    // 2. Dokumen
+    const infoPublikData = data.infoPublik || data.infopublik || [];
+    infoPublikData.forEach(item => {
+        let nama = item.namaDokumen || item.judul || "";
+        if (safeLower(nama).includes(lowerKeyword)) {
+            currentSearchResults.push({ 
+                type: 'DOKUMEN', title: nama, desc: item.deskripsi || item.kategori || "Dokumen Publik", 
+                link: item.linkDokumenFull || item.link || item.url || '#',
+                image: item.imageUrl || item.gambar || item.cover || item.sampul || "" 
+            });
+        }
+    });
+
+    // --- RENDER CARD ---
+    if (currentSearchResults.length === 0) {
+        container.innerHTML = `<div class="text-center py-5 text-muted">Tidak ditemukan hasil.</div>`;
     } else {
-        let html = '<div class="list-group shadow-sm border-0">';
-        results.forEach(res => {
-            let icon = res.type === 'BERITA' ? 'fa-newspaper' : (res.type === 'PEJABAT' ? 'fa-user-tie' : 'fa-file-pdf');
-            let badgeClass = res.type === 'BERITA' ? 'bg-primary' : (res.type === 'PEJABAT' ? 'bg-success' : 'bg-warning text-dark');
-            let target = res.isExternal ? 'target="_blank"' : '';
-            html += `<a href="${res.link}" class="list-group-item list-group-item-action p-4 border-start border-4 border-primary mb-3 rounded shadow-sm" ${target}><div class="d-flex w-100 justify-content-between align-items-center mb-2"><h5 class="mb-1 fw-bold text-primary">${res.title}</h5><span class="badge ${badgeClass} rounded-pill"><i class="fas ${icon} me-1"></i> ${res.type}</span></div><p class="mb-1 text-secondary">${res.desc}</p></a>`;
+        let html = '<div class="col-12">';
+        currentSearchResults.forEach((res, i) => {
+            let finalImg = (typeof fixGoogleDriveImage === 'function') ? fixGoogleDriveImage(res.image) : res.image;
+            
+            // Thumbnail Portrait 3:4
+            let imgDisplay = finalImg ? 
+                `<img src="${finalImg}" class="rounded shadow-sm" style="width: 100%; aspect-ratio: 3/4; object-fit: cover; border: 1px solid #eee;">` : 
+                `<div class="bg-light d-flex align-items-center justify-content-center rounded" style="width: 100%; aspect-ratio: 3/4; border: 1px solid #eee;">
+                    <i class="fas fa-file-alt text-muted opacity-25 fa-lg"></i>
+                 </div>`;
+
+            html += `
+            <div class="card mb-3 border-0 border-bottom rounded-0 shadow-none bg-transparent" onclick="showQuickPreview(${i})" style="cursor:pointer;">
+                <div class="row g-3 align-items-center py-2">
+                    <div class="col-3 col-md-2">
+                        ${imgDisplay}
+                    </div>
+                    <div class="col-9 col-md-10">
+                        <div class="card-body p-0">
+                            <span class="text-muted fw-bold text-uppercase" style="font-size: 0.65rem;">${res.type}</span>
+                            <h6 class="fw-bold text-dark mb-1 mt-1">${res.title}</h6>
+                            <p class="small text-secondary mb-0 text-truncate-2">${res.desc}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>`;
         });
         html += '</div>';
         container.innerHTML = html;
     }
 }
+
+/**
+ * FUNGSI PREVIEW (MODAL)
+ */
+function showQuickPreview(index) {
+    const res = currentSearchResults[index];
+    if (!res) return;
+
+    const modalEl = document.getElementById('modalSearchPreview');
+    const body = document.getElementById('modalSearchBody');
+    
+    if (!modalEl || !body) return;
+
+    if (res.type === 'DOKUMEN') {
+        let embedUrl = res.link.includes('drive.google.com') ? res.link.replace('/view', '/preview') : res.link;
+        body.innerHTML = `
+            <div style="height: 550px;">
+                <iframe src="${embedUrl}" width="100%" height="100%" frameborder="0"></iframe>
+            </div>`;
+    } else {
+        let finalImg = (typeof fixGoogleDriveImage === 'function') ? fixGoogleDriveImage(res.image) : res.image;
+        body.innerHTML = `
+            <div>
+                ${finalImg ? `<img src="${finalImg}" class="img-fluid w-100" style="max-height: 300px; object-fit: cover;">` : ''}
+                <div class="p-4">
+                    <h5 class="fw-bold text-dark mb-2">${res.title}</h5>
+                    <p class="text-secondary small lh-lg mb-4" style="text-align: justify;">${res.desc}</p>
+                    <a href="${res.link}" class="btn btn-dark w-100 rounded-pill fw-bold btn-sm">Buka Selengkapnya</a>
+                </div>
+            </div>`;
+    }
+
+    // Jalankan Modal
+    const myModal = new bootstrap.Modal(modalEl);
+    myModal.show();
+}
+
 
 function renderBanner(list) {
     const container = document.getElementById('banner-container');
