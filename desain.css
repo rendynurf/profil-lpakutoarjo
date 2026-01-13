@@ -13,109 +13,42 @@ h1, h2, h3, h4, h5, h6, .navbar-brand { font-family: 'Poppins', sans-serif; }
 a { text-decoration: none; }
 
 /* --- LOADING SCREEN --- */
-/* --- LOADING SCREEN (FIXED & CENTERED) --- */
 #loader-wrapper {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw; /* Gunakan vw/vh untuk full viewport */
-    height: 100vh;
-    background: #ffffff;
-    z-index: 9999;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    transition: opacity 0.5s ease-out, visibility 0.5s ease-out;
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: #ffffff; z-index: 9999; display: flex; flex-direction: column;
+    justify-content: center; align-items: center; transition: opacity 0.5s ease-out, visibility 0.5s ease-out;
 }
-
-.loader-content {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-}
-
-/* Wrapper Khusus agar Ring & Gambar selalu Presisi di Tengah */
-.loader-icon-box {
-    position: relative;
-    width: 160px;  /* Lebar dasar desktop */
-    height: 160px; /* Tinggi dasar desktop */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 20px; /* Jarak ke teks */
-}
-
-/* Gambar Garcy */
-.loader-img {
-    width: 100px; /* Ukuran gambar di dalam ring */
-    height: auto;
-    object-fit: contain;
-    position: relative;
-    z-index: 2; /* Di atas ring */
-    animation: bounce-garcy 2s infinite ease-in-out;
-}
-
-/* Lingkaran Berputar */
+.loader-content { position: relative; text-align: center; }
+.loader-img { width: 120px; height: auto; margin-bottom: 20px; animation: bounce-garcy 2s infinite ease-in-out; }
 .spinner-ring {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    border: 5px solid rgba(0, 51, 102, 0.1);
-    border-top: 5px solid var(--accent-gold);
-    border-radius: 50%;
-    animation: spin 1.5s linear infinite;
-    z-index: 1; /* Di bawah gambar */
+    position: absolute; top: 50%; left: 50%; width: 160px; height: 160px;
+    transform: translate(-50%, -65%); border: 5px solid rgba(0, 51, 102, 0.1);
+    border-top: 5px solid var(--accent-gold); border-radius: 50%; animation: spin 1.5s linear infinite; z-index: -1;
+}
+.loading-text { font-family: 'Poppins', sans-serif; font-weight: 600; color: var(--primary-blue); font-size: 1.2rem; letter-spacing: 1px; margin-top: 10px; animation: pulse-text 1.5s infinite; }
+.loader-hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+
+html {
+    height: 100%; /* HTML tetap 100% tidak masalah */
 }
 
-.loading-text {
-    font-family: 'Poppins', sans-serif;
-    font-weight: 600;
-    color: var(--primary-blue);
-    font-size: 1.2rem;
-    letter-spacing: 2px;
-    animation: pulse-text 1.5s infinite;
+body {
+    min-height: 100vh; /* Gunakan min-height agar bisa memanjang ke bawah */
+    height: auto;      /* Biarkan tinggi menyesuaikan konten */
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden; /* Mencegah geser kanan-kiri */
+    position: relative; /* Penting untuk stacking context */
 }
 
-/* --- ANIMASI KEYFRAMES (DIPERBAIKI) --- */
-/* Hapus transform translate karena kita sudah pakai Flexbox centering */
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+/* Tambahan: Pastikan loader tidak mengganggu scroll setelah hilang */
+body.loading {
+    overflow: hidden;
+    height: 100vh; /* Kunci tinggi hanya saat loading */
 }
-
-@keyframes bounce-garcy {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-10px); }
-}
-
-@keyframes pulse-text {
-    0%, 100% { opacity: 0.6; }
-    50% { opacity: 1; }
-}
-
-/* --- RESPONSIF MOBILE (DIPERBAIKI) --- */
-@media (max-width: 768px) {
-    /* Kecilkan ukuran Wrapper (Ring ikut mengecil otomatis karena width 100%) */
-    .loader-icon-box {
-        width: 120px;
-        height: 120px;
-        margin-bottom: 15px;
-    }
-
-    /* Kecilkan gambar proporsional */
-    .loader-img {
-        width: 70px; 
-    }
-
-    .loading-text {
-        font-size: 1rem;
-    }
-}
+@keyframes spin { 0% { transform: translate(-50%, -65%) rotate(0deg); } 100% { transform: translate(-50%, -65%) rotate(360deg); } }
+@keyframes bounce-garcy { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
+@keyframes pulse-text { 0%, 100% { opacity: 0.6; } 50% { opacity: 1; } }
 
 /* --- TOP BAR & HEADER --- */
 .top-bar { background: linear-gradient(90deg, var(--primary-blue) 0%, var(--secondary-blue) 100%); color: white; padding: 8px 0; font-size: 0.85rem; }
@@ -151,17 +84,7 @@ a { text-decoration: none; }
 .carousel-caption p { color: #f0f0f0; font-weight: 400; font-size: 1.1rem; letter-spacing: 0.5px; max-width: 800px; margin: 0 auto 20px auto; text-shadow: 0px 2px 5px rgba(0,0,0,0.7); }
 .btn-banner { font-size: 0.9rem; padding: 10px 25px; border-radius: 50px; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); transition: transform 0.3s; }
 .btn-banner:hover { transform: translateY(-3px); }
-@media (max-width: 768px) { 
-    .carousel-item img { 
-        /* Menggunakan vh (viewport height) agar proporsional dengan layar HP */
-        height: 50vh; 
-        min-height: 300px; /* Jaga agar tidak terlalu pendek di HP kecil */
-        object-position: center top; /* Fokus gambar ke bagian atas-tengah */
-    } 
-    .carousel-caption {
-        bottom: 10%; /* Naikkan sedikit caption agar tidak tertutup */
-    }
-}
+
 /* Responsif untuk Mobile */
 @media (max-width: 768px) {
     .loader-img { width: 80px; margin-bottom: 15px; }
