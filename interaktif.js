@@ -806,7 +806,7 @@ if (list.length > 0) {
     </div>`;
 }
     
-// --- CARD BESAR 2: 5 Pejabat Utama (Responsif Grid) ---
+// --- CARD BESAR 2: 5 Pejabat Utama (Eselon IVA) ---
 const start2 = 1;
 const end2 = Math.min(6, list.length);
 
@@ -829,7 +829,9 @@ if (end2 > start2) {
                              alt="${p.nama}">
                     </div>
                     <div class="card-body text-center p-2 p-md-3">
-                        <h6 class="fw-bold text-primary mb-1 text-truncate" style="font-size: 0.83rem;">${p.nama}</h6>
+                        <h6 class="fw-bold text-primary mb-1" style="font-size: 0.83rem; white-space: normal; min-height: 2.4em; display: flex; align-items: center; justify-content: center; line-height: 1.2;">
+                            ${p.nama}
+                        </h6>
                         <small class="text-muted d-block text-uppercase" style="font-size: 0.65rem; line-height: 1.2;">${p.jabatan}</small>
                     </div>
                 </div>
@@ -840,7 +842,7 @@ if (end2 > start2) {
     </div>`;
 }
     
-// --- CARD BESAR 3: Eselon V (Grid Disamakan dengan Eselon IVA) ---
+// --- CARD BESAR 3: Eselon V ---
 const start3 = 6;
 if (list.length > start3) {
     html += `
@@ -861,7 +863,9 @@ if (list.length > start3) {
                              alt="${p.nama}">
                     </div>
                     <div class="card-body text-center p-2 p-md-3">
-                        <h6 class="fw-bold text-primary mb-1 text-truncate" style="font-size: 0.83rem;" title="${p.nama}">${p.nama}</h6>
+                        <h6 class="fw-bold text-primary mb-1" style="font-size: 0.83rem; white-space: normal; min-height: 2.4em; display: flex; align-items: center; justify-content: center; line-height: 1.2;">
+                            ${p.nama}
+                        </h6>
                         <small class="text-muted d-block text-uppercase" style="font-size: 0.65rem; line-height: 1.2;">${p.jabatan}</small>
                     </div>
                 </div>
