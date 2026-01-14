@@ -829,7 +829,16 @@ if (end2 > start2) {
                              alt="${p.nama}">
                     </div>
                     <div class="card-body text-center p-2 p-md-3">
-                        <h6 class="fw-bold text-primary mb-1" style="font-size: 0.83rem; white-space: normal; min-height: 2.4em; display: flex; align-items: center; justify-content: center; line-height: 1.2;">
+                        <h6 class="fw-bold text-primary mb-1" style="
+                            font-size: 0.8rem; 
+                            white-space: normal; 
+                            min-height: 2.4em; 
+                            display: flex; 
+                            align-items: center; 
+                            justify-content: center; 
+                            line-height: 1.2;
+                            word-break: break-word;
+                        ">
                             ${p.nama}
                         </h6>
                         <small class="text-muted d-block text-uppercase" style="font-size: 0.65rem; line-height: 1.2;">${p.jabatan}</small>
@@ -863,7 +872,16 @@ if (list.length > start3) {
                              alt="${p.nama}">
                     </div>
                     <div class="card-body text-center p-2 p-md-3">
-                        <h6 class="fw-bold text-primary mb-1" style="font-size: 0.83rem; white-space: normal; min-height: 2.4em; display: flex; align-items: center; justify-content: center; line-height: 1.2;">
+                        <h6 class="fw-bold text-primary mb-1" style="
+                            font-size: 0.8rem; 
+                            white-space: normal; 
+                            min-height: 2.4em; 
+                            display: flex; 
+                            align-items: center; 
+                            justify-content: center; 
+                            line-height: 1.2;
+                            word-break: break-word;
+                        ">
                             ${p.nama}
                         </h6>
                         <small class="text-muted d-block text-uppercase" style="font-size: 0.65rem; line-height: 1.2;">${p.jabatan}</small>
